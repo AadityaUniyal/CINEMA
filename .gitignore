@@ -76,3 +76,7 @@ htmlcov/
 # OS
 Thumbs.db
 .DS_Store
+
+# Large data files
+ratings.csv
+movies.csv

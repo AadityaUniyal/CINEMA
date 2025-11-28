@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: movielens_mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: movielens_db
+
+  redis:
+    image: redis:7-alpine
+    container_name: movielens_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  backend:
+    build: ./backend
+    container_name: movielens_backend
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./backend:/app
+      - ./movies.csv:/app/movies.csv
+      - ./ratings.csv:/app/ratings.csv
+      - ./tags.csv:/app/tags.csv
+      - ./links.csv:/app/links.csv
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/
+      - REDIS_HOST=redis
+      - FLASK_ENV=development
+    depends_on:
+      - mongodb
+      - redis
+
+  frontend:
+    build: ./frontend
+    container_name: movielens_frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - REACT_APP_API_URL=http://localhost:5000
+    depends_on:
+      - backend
+
+volumes:
+  mongo_data:
+  redis_data:

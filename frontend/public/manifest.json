@@ -1,0 +1,9 @@
+{
+  "short_name": "MovieLens",
+  "name": "MovieLens Recommender",
+  "icons": [],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#e50914",
+  "background_color": "#141414"
+}

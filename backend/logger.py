@@ -7,20 +7,16 @@ class AppLogger:
         self.logger = logging.getLogger(name)
         self.logger.setLevel(logging.INFO)
         
-        # Create logs directory if it doesn't exist
         if not os.path.exists('logs'):
             os.makedirs('logs')
         
-        # File handler
         log_file = f'logs/app_{datetime.now().strftime("%Y%m%d")}.log'
         file_handler = logging.FileHandler(log_file)
         file_handler.setLevel(logging.INFO)
         
-        # Console handler
         console_handler = logging.StreamHandler()
         console_handler.setLevel(logging.INFO)
         
-        # Formatter
         formatter = logging.Formatter(
             '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
         )
@@ -42,5 +38,4 @@ class AppLogger:
     def debug(self, message):
         self.logger.debug(message)
 
-# Global logger instance
 logger = AppLogger()

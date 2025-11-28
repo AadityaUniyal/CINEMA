@@ -31,29 +31,28 @@ function App() {
     setUserId(id);
     setUserName(name);
     setIsLoggedIn(true);
-    
-    // Always check if user has preferences set (0 preferred genres = new user)
+
     try {
-      const response = await fetch(`http://localhost:5000/api/auth/profile/${id}`);
+      const response = await fetch(`http:
       const data = await response.json();
       
       if (data.success && data.profile) {
         const hasPreferences = data.profile.preferredGenres && data.profile.preferredGenres.length > 0;
         if (!hasPreferences) {
-          // User has 0 preferred genres = show genre selection
+          
           setShowGenrePreference(true);
         } else {
-          // User already has preferences
+          
           setUserGenres(data.profile.preferredGenres);
           setShowGenrePreference(false);
         }
       } else {
-        // No profile found, show genre selection
+        
         setShowGenrePreference(true);
       }
     } catch (error) {
       console.error('Error checking preferences:', error);
-      // On error, show genre selection to be safe
+      
       setShowGenrePreference(true);
     }
   };

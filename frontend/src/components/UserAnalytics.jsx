@@ -17,8 +17,8 @@ const UserAnalytics = ({ userId }) => {
   const fetchUserData = async () => {
     try {
       const [statsRes, similarRes] = await Promise.all([
-        axios.get(`http://localhost:5000/api/user/${userId}/stats`),
-        axios.get(`http://localhost:5000/api/similar-users/${userId}`)
+        axios.get(`http:
+        axios.get(`http:
       ]);
       
       setStats(statsRes.data);
@@ -32,7 +32,7 @@ const UserAnalytics = ({ userId }) => {
 
   const exportUserData = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/export/user/${userId}`);
+      const response = await axios.get(`http:
       const blob = new Blob([JSON.stringify(response.data, null, 2)], { type: 'application/json' });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');

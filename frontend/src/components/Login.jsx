@@ -89,8 +89,8 @@ const Login = ({ onLogin }) => {
 
     try {
       if (isRegister) {
-        // Register
-        const response = await axios.post('http://localhost:5000/api/auth/register', {
+        
+        const response = await axios.post('http:
           name: formData.name.trim(),
           email: formData.email.trim(),
           password: formData.password
@@ -103,8 +103,8 @@ const Login = ({ onLogin }) => {
           }, 2000);
         }
       } else {
-        // Login
-        const response = await axios.post('http://localhost:5000/api/auth/login', {
+        
+        const response = await axios.post('http:
           email: formData.email.trim(),
           password: formData.password
         });

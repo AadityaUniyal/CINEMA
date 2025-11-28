@@ -9,11 +9,9 @@ class UserManager:
         self.favorites_collection = db['favorites'] if db else None
     
     def create_user(self, username, email, password):
-        """Create a new user"""
         if not self.users_collection:
             return None
         
-        # Check if user exists
         if self.users_collection.find_one({'$or': [{'username': username}, {'email': email}]}):
             return None
         
@@ -29,13 +27,11 @@ class UserManager:
         return str(result.inserted_id)
     
     def authenticate_user(self, username, password):
-        """Authenticate user"""
         if not self.users_collection:
             return None
         
         user = self.users_collection.find_one({'username': username})
         if user and check_password_hash(user['password'], password):
-            # Update last login
             self.users_collection.update_one(
                 {'_id': user['_id']},
                 {'$set': {'last_login': datetime.now()}}
@@ -48,7 +44,6 @@ class UserManager:
         return None
     
     def save_preferences(self, user_id, preferred_genres, favorite_tags):
-        """Save user preferences"""
         if not self.preferences_collection:
             return False
         
@@ -67,18 +62,15 @@ class UserManager:
         return True
     
     def get_preferences(self, user_id):
-        """Get user preferences"""
         if not self.preferences_collection:
             return None
         
         return self.preferences_collection.find_one({'user_id': user_id})
     
     def add_favorite(self, user_id, movie_id):
-        """Add movie to favorites"""
         if not self.favorites_collection:
             return False
         
-        # Check if already favorited
         existing = self.favorites_collection.find_one({
             'user_id': user_id,
             'movie_id': movie_id
@@ -97,7 +89,6 @@ class UserManager:
         return True
     
     def remove_favorite(self, user_id, movie_id):
-        """Remove movie from favorites"""
         if not self.favorites_collection:
             return False
         
@@ -108,7 +99,6 @@ class UserManager:
         return result.deleted_count > 0
     
     def get_favorites(self, user_id):
-        """Get user's favorite movies"""
         if not self.favorites_collection:
             return []
         
@@ -116,7 +106,6 @@ class UserManager:
         return [{'movie_id': fav['movie_id'], 'added_at': fav['added_at']} for fav in favorites]
     
     def is_favorite(self, user_id, movie_id):
-        """Check if movie is in favorites"""
         if not self.favorites_collection:
             return False
         

@@ -1,4 +1,4 @@
-/* Netflix-Style Login Page */
+
 .login-page {
   position: fixed;
   top: 0;
@@ -403,7 +403,6 @@
   font-size: 0.95rem;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .logo {
     font-size: 3rem;

@@ -18,13 +18,12 @@ const Dashboard = ({ userId }) => {
     setLoading(true);
     try {
       const [statsRes, reviewsRes, watchlistRes, profileRes] = await Promise.all([
-        axios.get(`http://localhost:5000/api/user/${userId}/stats`).catch(() => ({ data: null })),
-        axios.get(`http://localhost:5000/api/reviews/user/${userId}`).catch(() => ({ data: { reviews: [] } })),
-        axios.get(`http://localhost:5000/api/watchlist/${userId}`).catch(() => ({ data: { watchlist: [] } })),
-        axios.get(`http://localhost:5000/api/auth/profile/${userId}`).catch(() => ({ data: { profile: null } }))
+        axios.get(`http:
+        axios.get(`http:
+        axios.get(`http:
+        axios.get(`http:
       ]);
 
-      // Handle new users with no data
       setUserStats(statsRes.data || {
         total_ratings: 0,
         avg_rating: 0,
@@ -32,11 +31,11 @@ const Dashboard = ({ userId }) => {
       });
       
       const reviews = reviewsRes.data.reviews || [];
-      // Fetch movie titles for reviews
+      
       if (reviews.length > 0) {
         const movieIds = reviews.map(r => r.movieId);
         try {
-          const moviesRes = await axios.get('http://localhost:5000/api/movies', {
+          const moviesRes = await axios.get('http:
             params: { per_page: 1000 }
           });
           const moviesMap = {};
@@ -56,7 +55,7 @@ const Dashboard = ({ userId }) => {
       setUserProfile(profileRes.data.profile);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
-      // Set default values for new users
+      
       setUserStats({
         total_ratings: 0,
         avg_rating: 0,

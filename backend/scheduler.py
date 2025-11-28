@@ -8,7 +8,6 @@ class TaskScheduler:
         self.running = False
     
     def add_task(self, func, interval_seconds, name=None):
-        """Add a recurring task"""
         task = {
             'func': func,
             'interval': interval_seconds,
@@ -18,7 +17,6 @@ class TaskScheduler:
         self.tasks.append(task)
     
     def start(self):
-        """Start the scheduler"""
         if self.running:
             return
         
@@ -28,12 +26,10 @@ class TaskScheduler:
         print("Task scheduler started")
     
     def stop(self):
-        """Stop the scheduler"""
         self.running = False
         print("Task scheduler stopped")
     
     def _run(self):
-        """Main scheduler loop"""
         while self.running:
             current_time = time.time()
             
@@ -46,4 +42,4 @@ class TaskScheduler:
                     except Exception as e:
                         print(f"Error in task {task['name']}: {e}")
             
-            time.sleep(10)  # Check every 10 seconds
+            time.sleep(10)

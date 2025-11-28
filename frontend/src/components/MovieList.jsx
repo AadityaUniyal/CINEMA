@@ -23,7 +23,7 @@ const MovieList = ({ userId }) => {
 
   const fetchGenres = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/genres');
+      const response = await axios.get('http:
       setGenres(response.data.genres);
     } catch (error) {
       console.error('Error fetching genres:', error);
@@ -36,7 +36,7 @@ const MovieList = ({ userId }) => {
       const params = { page, per_page: 24 };
       if (selectedGenre) params.genre = selectedGenre;
       
-      const response = await axios.get('http://localhost:5000/api/movies', { params });
+      const response = await axios.get('http:
       setMovies(response.data.movies);
       setTotalPages(response.data.total_pages);
       setSearchResults(null);

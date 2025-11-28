@@ -16,8 +16,8 @@ const PreferenceSetup = ({ userId, onComplete }) => {
   const fetchOptions = async () => {
     try {
       const [genresRes, tagsRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/genres'),
-        axios.get('http://localhost:5000/api/tags')
+        axios.get('http:
+        axios.get('http:
       ]);
       setGenres(genresRes.data.genres);
       setTags(tagsRes.data.tags);
@@ -52,7 +52,7 @@ const PreferenceSetup = ({ userId, onComplete }) => {
 
     setSaving(true);
     try {
-      await axios.post('http://localhost:5000/api/preferences/setup', {
+      await axios.post('http:
         user_id: userId,
         preferred_genres: selectedGenres,
         favorite_tags: selectedTags

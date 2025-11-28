@@ -16,7 +16,7 @@ class DataProcessor:
         if use_mongodb:
             try:
                 client = MongoClient(Config.MONGO_URI, serverSelectionTimeoutMS=2000)
-                client.server_info()  # Test connection
+                client.server_info()
                 self.db = client[Config.DB_NAME]
                 print("✅ Connected to MongoDB")
             except Exception as e:
@@ -26,14 +26,12 @@ class DataProcessor:
         self.load_data()
     
     def load_data(self):
-        """Load data from MongoDB or CSV files"""
         try:
             if self.use_mongodb and self.db is not None:
                 self._load_from_mongodb()
             else:
                 self._load_from_csv()
             
-            # Process genres
             if 'genres_list' not in self.movies.columns:
                 self.movies['genres_list'] = self.movies['genres'].str.split('|')
             
@@ -43,7 +41,6 @@ class DataProcessor:
             raise
     
     def _load_from_mongodb(self):
-        """Load data from MongoDB collections"""
         print("Loading data from MongoDB...")
         
         movies_data = list(self.db['movies'].find({}, {'_id': 0}))
@@ -51,24 +48,22 @@ class DataProcessor:
         
         self.movies = pd.DataFrame(movies_data)
         self.ratings = pd.DataFrame(ratings_data)
-        self.tags = pd.DataFrame()  # Empty dataframe
-        self.links = pd.DataFrame()  # Empty dataframe
+        self.tags = pd.DataFrame()
+        self.links = pd.DataFrame()
         
         print("✓ Data loaded from MongoDB (movies and ratings only)")
     
     def _load_from_csv(self):
-        """Load data from CSV files (limited to 20000 rows each)"""
         print("Loading data from CSV files...")
         
         self.movies = pd.read_csv(f'{Config.DATA_DIR}/{Config.MOVIES_FILE}', nrows=20000)
         self.ratings = pd.read_csv(f'{Config.DATA_DIR}/{Config.RATINGS_FILE}', nrows=20000)
-        self.tags = pd.DataFrame()  # Empty dataframe
-        self.links = pd.DataFrame()  # Empty dataframe
+        self.tags = pd.DataFrame()
+        self.links = pd.DataFrame()
         
         print("✓ Data loaded from CSV (movies and ratings only)")
     
     def get_movie_stats(self):
-        """Calculate movie statistics"""
         stats = self.ratings.groupby('movieId').agg({
             'rating': ['mean', 'count']
         }).reset_index()
@@ -81,7 +76,6 @@ class DataProcessor:
         return movies_with_stats
     
     def get_genre_distribution(self):
-        """Get genre distribution statistics"""
         genres = []
         for genre_list in self.movies['genres_list']:
             if isinstance(genre_list, list):
@@ -91,24 +85,20 @@ class DataProcessor:
         return genre_counts.to_dict()
     
     def get_top_rated_movies(self, min_ratings=50, limit=20):
-        """Get top rated movies with minimum rating threshold"""
         stats = self.get_movie_stats()
         top_movies = stats[stats['rating_count'] >= min_ratings].nlargest(limit, 'avg_rating')
         return top_movies.to_dict('records')
     
     def search_movies(self, query, limit=50):
-        """Search movies by title"""
         query = query.lower()
         results = self.movies[self.movies['title'].str.lower().str.contains(query, na=False)]
         return results.head(limit).to_dict('records')
     
     def get_movies_by_genre(self, genre, limit=50):
-        """Get movies by genre"""
         results = self.movies[self.movies['genres'].str.contains(genre, case=False, na=False)]
         return results.head(limit).to_dict('records')
     
     def get_user_rating_stats(self, user_id):
-        """Get user rating statistics"""
         user_ratings = self.ratings[self.ratings['userId'] == user_id]
         
         if len(user_ratings) == 0:
@@ -121,7 +111,6 @@ class DataProcessor:
         }
     
     def _get_user_favorite_genres(self, user_id, top_n=5):
-        """Get user's favorite genres based on ratings"""
         user_ratings = self.ratings[self.ratings['userId'] == user_id]
         rated_movies = self.movies[self.movies['movieId'].isin(user_ratings['movieId'])]
         

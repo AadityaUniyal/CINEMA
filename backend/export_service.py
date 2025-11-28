@@ -6,7 +6,6 @@ from datetime import datetime
 class ExportService:
     @staticmethod
     def export_to_csv(data, columns):
-        """Export data to CSV format"""
         output = StringIO()
         writer = csv.DictWriter(output, fieldnames=columns)
         writer.writeheader()
@@ -15,12 +14,10 @@ class ExportService:
     
     @staticmethod
     def export_to_json(data):
-        """Export data to JSON format"""
         return json.dumps(data, indent=2, default=str)
     
     @staticmethod
     def export_user_data(user_id, data_processor, db):
-        """Export all user data (ratings, watchlist, history)"""
         user_data = {
             'userId': user_id,
             'exportDate': datetime.now().isoformat(),
@@ -29,16 +26,13 @@ class ExportService:
             'statistics': {}
         }
         
-        # Get ratings
         user_ratings = data_processor.ratings[data_processor.ratings['userId'] == user_id]
         user_data['ratings'] = user_ratings.to_dict('records')
         
-        # Get watchlist if DB available
         if db:
             watchlist = list(db['watchlists'].find({'userId': user_id}))
             user_data['watchlist'] = [{'movieId': item['movieId'], 'addedAt': str(item['addedAt'])} for item in watchlist]
         
-        # Get statistics
         stats = data_processor.get_user_rating_stats(user_id)
         if stats:
             user_data['statistics'] = stats
@@ -47,7 +41,6 @@ class ExportService:
     
     @staticmethod
     def export_recommendations_report(user_id, recommendations, data_processor):
-        """Export recommendations with detailed info"""
         report = {
             'userId': user_id,
             'generatedAt': datetime.now().isoformat(),

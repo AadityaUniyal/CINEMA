@@ -1,4 +1,4 @@
-/* Netflix-Style Theme */
+
 * {
   margin: 0;
   padding: 0;
@@ -30,7 +30,6 @@ body {
   background: var(--netflix-black);
 }
 
-/* Header - Netflix Style */
 .header {
   position: sticky;
   top: 0;
@@ -100,7 +99,6 @@ body {
   background: rgba(0,0,0,0.7);
 }
 
-/* Navigation - Netflix Style */
 .nav {
   display: flex;
   gap: 5px;
@@ -140,7 +138,6 @@ body {
   border-radius: 2px 2px 0 0;
 }
 
-/* Main Content */
 .main-content {
   padding: 20px 4%;
   max-width: 1920px;
@@ -160,7 +157,6 @@ body {
   }
 }
 
-/* Search Bar - Netflix Style */
 .search-bar {
   display: flex;
   gap: 10px;
@@ -215,7 +211,6 @@ body {
   cursor: not-allowed;
 }
 
-/* Filters */
 .filters {
   margin: 20px 0 30px;
 }
@@ -242,7 +237,6 @@ body {
   border-color: var(--netflix-red);
 }
 
-/* Movie Grid - Netflix Style */
 .movies-grid, .watchlist-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -256,7 +250,6 @@ body {
   }
 }
 
-/* Movie Card - Netflix Style */
 .movie-card, .watchlist-item {
   background: var(--netflix-gray);
   border-radius: 6px;
@@ -317,7 +310,6 @@ body {
   gap: 4px;
 }
 
-/* Action Buttons */
 .movie-actions {
   display: flex;
   gap: 8px;
@@ -355,7 +347,6 @@ body {
   border-color: rgba(255,255,255,0.5);
 }
 
-/* Rating Input */
 .rating-input {
   margin-top: 15px;
   padding: 15px;
@@ -422,7 +413,6 @@ body {
   opacity: 0.5;
 }
 
-/* Pagination */
 .pagination {
   display: flex;
   justify-content: center;
@@ -458,7 +448,6 @@ body {
   color: var(--netflix-light-gray);
 }
 
-/* Loading & Empty States */
 .loading, .error, .empty-state {
   text-align: center;
   padding: 80px 20px;
@@ -493,7 +482,6 @@ body {
   color: var(--netflix-light-gray);
 }
 
-/* Stats Grid */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -529,7 +517,6 @@ body {
   line-height: 1;
 }
 
-/* Charts */
 .charts-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
@@ -559,7 +546,6 @@ body {
   font-weight: 600;
 }
 
-/* Top Rated Section */
 .top-rated-section {
   margin: 40px 0;
 }
@@ -636,7 +622,6 @@ body {
   font-size: 0.85rem;
 }
 
-/* Buttons */
 button {
   font-family: inherit;
 }
@@ -671,7 +656,6 @@ button {
   background: #3bc45a;
 }
 
-/* Watchlist Actions */
 .watchlist-actions {
   display: flex;
   gap: 10px;
@@ -708,7 +692,6 @@ button {
   background: rgba(255,255,255,0.2);
 }
 
-/* Discovery Controls */
 .discovery-controls {
   display: flex;
   gap: 15px;
@@ -750,14 +733,12 @@ button {
   cursor: not-allowed;
 }
 
-/* Subtitle */
 .subtitle {
   color: var(--netflix-light-gray);
   margin-bottom: 25px;
   font-size: 1.1rem;
 }
 
-/* Responsive Design */
 @media (max-width: 1200px) {
   .movies-grid, .watchlist-grid {
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -819,7 +800,6 @@ button {
   }
 }
 
-/* Smooth Scrollbar */
 ::-webkit-scrollbar {
   width: 10px;
 }
@@ -837,14 +817,11 @@ button {
   background: #555;
 }
 
-/* Selection */
 ::selection {
   background: var(--netflix-red);
   color: white;
 }
 
-
-/* Authentication Styles */
 .auth-container {
   min-height: 100vh;
   display: flex;
@@ -944,7 +921,6 @@ button {
   text-decoration: underline;
 }
 
-/* Preference Setup Styles */
 .preference-setup {
   min-height: 100vh;
   background: var(--netflix-black);
@@ -1063,7 +1039,6 @@ button {
   text-decoration: underline;
 }
 
-/* Favorite Button on Movie Card */
 .favorite-btn {
   position: absolute;
   top: 10px;
@@ -1096,7 +1071,6 @@ button {
   50% { transform: scale(1.2); }
 }
 
-/* Logout Button */
 .logout-btn {
   background: rgba(255, 255, 255, 0.1) !important;
   border: 1px solid rgba(255, 255, 255, 0.3) !important;
@@ -1107,7 +1081,6 @@ button {
   border-color: rgba(255, 255, 255, 0.5) !important;
 }
 
-/* Favorites Section */
 .favorites {
   animation: fadeIn 0.4s ease;
 }
@@ -1118,7 +1091,6 @@ button {
   color: var(--netflix-white);
 }
 
-/* Responsive Adjustments */
 @media (max-width: 768px) {
   .auth-box {
     padding: 40px 30px;
@@ -1158,8 +1130,6 @@ button {
   }
 }
 
-
-/* Trending Genres Section */
 .trending-genres {
   margin: 30px 0;
   padding: 25px;
@@ -1212,7 +1182,6 @@ button {
   font-weight: 600;
 }
 
-/* Enhanced Movie Card */
 .movie-card {
   background: var(--netflix-gray);
   border-radius: 8px;
@@ -1353,7 +1322,6 @@ button {
   50% { transform: scale(1.2); }
 }
 
-/* Rating Input */
 .rating-input {
   margin-top: 15px;
   padding: 15px;
@@ -1447,7 +1415,6 @@ button {
   cursor: not-allowed;
 }
 
-/* Reviews Section */
 .reviews-section {
   margin-top: 15px;
   padding: 15px;
@@ -1538,7 +1505,6 @@ button {
   color: rgba(255, 255, 255, 0.4);
 }
 
-/* Enhanced Filters */
 .filters {
   display: flex;
   gap: 15px;
@@ -1589,7 +1555,6 @@ button {
   transform: translateY(-2px);
 }
 
-/* Enhanced Pagination */
 .pagination {
   display: flex;
   justify-content: center;
@@ -1629,7 +1594,6 @@ button {
   font-weight: 600;
 }
 
-/* Enhanced Empty State */
 .empty-state {
   text-align: center;
   padding: 80px 20px;
@@ -1647,7 +1611,6 @@ button {
   color: var(--netflix-light-gray);
 }
 
-/* Scrollbar Styling */
 .reviews-section::-webkit-scrollbar {
   width: 8px;
 }
@@ -1666,7 +1629,6 @@ button {
   background: #f40612;
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
   .trending-genres h3 {
     font-size: 1.2rem;
@@ -1699,8 +1661,6 @@ button {
   }
 }
 
-
-/* Enhanced App Logo */
 .app-logo {
   font-size: 2.5rem;
   font-weight: 900;
@@ -1719,7 +1679,6 @@ button {
   font-weight: 300;
 }
 
-/* User Info Header */
 .user-info-header {
   display: flex;
   align-items: center;
@@ -1754,7 +1713,6 @@ button {
   border-color: var(--netflix-red);
 }
 
-/* Enhanced Search Bar with Autocomplete */
 .search-bar {
   position: relative;
   margin-bottom: 30px;
@@ -1854,7 +1812,6 @@ button {
   animation: spin 0.8s linear infinite;
 }
 
-/* Search Suggestions Dropdown */
 .search-suggestions {
   position: absolute;
   top: calc(100% + 10px);
@@ -1944,7 +1901,6 @@ button {
   white-space: nowrap;
 }
 
-/* Enhanced Main Content Background */
 .main-content {
   min-height: calc(100vh - 200px);
   padding: 30px 4%;
@@ -1975,13 +1931,11 @@ button {
   50% { opacity: 1; }
 }
 
-/* Enhanced Movie List */
 .movie-list {
   position: relative;
   z-index: 1;
 }
 
-/* Smooth Scrollbar */
 ::-webkit-scrollbar {
   width: 12px;
   height: 12px;
@@ -2001,7 +1955,6 @@ button {
   background: linear-gradient(180deg, #ff1a1a 0%, var(--netflix-red) 100%);
 }
 
-/* Responsive Enhancements */
 @media (max-width: 768px) {
   .app-logo {
     font-size: 2rem;

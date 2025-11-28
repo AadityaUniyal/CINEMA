@@ -13,7 +13,7 @@ const Favorites = ({ userId }) => {
   const fetchFavorites = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`http://localhost:5000/api/favorites/${userId}`);
+      const response = await axios.get(`http:
       setFavorites(response.data.favorites);
     } catch (error) {
       console.error('Error fetching favorites:', error);

@@ -18,16 +18,15 @@ const MovieCard = ({ movie, userId, onUpdate }) => {
     
     setIsSubmitting(true);
     try {
-      // Submit rating
-      await axios.post('http://localhost:5000/api/rate', {
+      
+      await axios.post('http:
         userId,
         movieId: movie.movieId,
         rating
       });
-      
-      // Submit review if comment exists
+
       if (comment.trim()) {
-        await axios.post('http://localhost:5000/api/reviews', {
+        await axios.post('http:
           userId,
           movieId: movie.movieId,
           rating,
@@ -49,7 +48,7 @@ const MovieCard = ({ movie, userId, onUpdate }) => {
 
   const loadReviews = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/reviews/${movie.movieId}`);
+      const response = await axios.get(`http:
       setReviews(response.data.reviews || []);
       setShowReviews(true);
     } catch (error) {
@@ -73,10 +72,10 @@ const MovieCard = ({ movie, userId, onUpdate }) => {
     setWatchlistLoading(true);
     try {
       if (isInWatchlist) {
-        await axios.delete(`http://localhost:5000/api/watchlist/${userId}/${movie.movieId}`);
+        await axios.delete(`http:
         setIsInWatchlist(false);
       } else {
-        await axios.post(`http://localhost:5000/api/watchlist/${userId}/${movie.movieId}`);
+        await axios.post(`http:
         setIsInWatchlist(true);
       }
       if (onUpdate) onUpdate();

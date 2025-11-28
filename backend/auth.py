@@ -9,7 +9,6 @@ class AuthManager:
     
     @staticmethod
     def generate_token(user_id):
-        """Generate JWT token for user"""
         payload = {
             'user_id': user_id,
             'exp': datetime.utcnow() + timedelta(days=7),
@@ -19,7 +18,6 @@ class AuthManager:
     
     @staticmethod
     def verify_token(token):
-        """Verify JWT token"""
         try:
             payload = jwt.decode(token, AuthManager.SECRET_KEY, algorithms=['HS256'])
             return payload['user_id']
@@ -29,7 +27,6 @@ class AuthManager:
             return None
 
 def token_required(f):
-    """Decorator for protected routes"""
     @wraps(f)
     def decorated(*args, **kwargs):
         token = request.headers.get('Authorization')

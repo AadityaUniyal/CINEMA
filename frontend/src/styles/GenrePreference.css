@@ -1,4 +1,4 @@
-/* Genre Preference Page */
+
 .genre-preference-page {
   position: fixed;
   top: 0;
@@ -153,7 +153,6 @@
   font-size: 0.9rem;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .preference-header h1 {
     font-size: 2rem;

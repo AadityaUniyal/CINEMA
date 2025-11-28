@@ -1,4 +1,4 @@
-/* Dashboard Styles */
+
 .dashboard {
   padding: 30px;
   max-width: 1400px;
@@ -409,7 +409,6 @@
   font-size: 1rem;
 }
 
-/* Welcome Message for New Users */
 .welcome-message {
   text-align: center;
   padding: 60px 40px;
@@ -490,7 +489,6 @@
   line-height: 1.4;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .dashboard {
     padding: 20px;

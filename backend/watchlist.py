@@ -6,7 +6,6 @@ class WatchlistManager:
         self.collection = db['watchlists'] if db else None
     
     def add_to_watchlist(self, user_id, movie_id):
-        """Add movie to user's watchlist"""
         if not self.collection:
             return False
         
@@ -17,7 +16,6 @@ class WatchlistManager:
             'watched': False
         }
         
-        # Check if already exists
         existing = self.collection.find_one({'userId': user_id, 'movieId': movie_id})
         if existing:
             return False
@@ -26,7 +24,6 @@ class WatchlistManager:
         return True
     
     def remove_from_watchlist(self, user_id, movie_id):
-        """Remove movie from watchlist"""
         if not self.collection:
             return False
         
@@ -34,7 +31,6 @@ class WatchlistManager:
         return result.deleted_count > 0
     
     def get_watchlist(self, user_id):
-        """Get user's watchlist"""
         if not self.collection:
             return []
         
@@ -42,7 +38,6 @@ class WatchlistManager:
         return [{'movieId': item['movieId'], 'addedAt': item['addedAt']} for item in watchlist]
     
     def mark_as_watched(self, user_id, movie_id):
-        """Mark movie as watched"""
         if not self.collection:
             return False
         
@@ -53,7 +48,6 @@ class WatchlistManager:
         return result.modified_count > 0
     
     def get_watched_movies(self, user_id):
-        """Get user's watched movies"""
         if not self.collection:
             return []
         

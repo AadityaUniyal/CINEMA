@@ -20,14 +20,13 @@ const Analytics = () => {
   const fetchAnalytics = async () => {
     try {
       const [genreRes, ratingRes, trendsRes, topRatedRes, activityRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/analytics/genre-distribution'),
-        axios.get('http://localhost:5000/api/analytics/rating-distribution'),
-        axios.get('http://localhost:5000/api/analytics/trends'),
-        axios.get('http://localhost:5000/api/analytics/top-rated', { params: { min_ratings: 100, limit: 10 } }),
-        axios.get('http://localhost:5000/api/analytics/user-activity')
+        axios.get('http:
+        axios.get('http:
+        axios.get('http:
+        axios.get('http:
+        axios.get('http:
       ]);
 
-      // Genre distribution
       const genres = Object.keys(genreRes.data.distribution).slice(0, 10);
       const genreCounts = Object.values(genreRes.data.distribution).slice(0, 10);
       setGenreData({
@@ -41,7 +40,6 @@ const Analytics = () => {
         }]
       });
 
-      // Rating distribution
       const ratings = Object.keys(ratingRes.data.distribution).sort();
       const ratingCounts = ratings.map(r => ratingRes.data.distribution[r]);
       setRatingData({
@@ -53,7 +51,6 @@ const Analytics = () => {
         }]
       });
 
-      // Trends
       const years = trendsRes.data.yearly_trends.map(t => t.year);
       const avgRatings = trendsRes.data.yearly_trends.map(t => t.avg_rating);
       setTrendsData({

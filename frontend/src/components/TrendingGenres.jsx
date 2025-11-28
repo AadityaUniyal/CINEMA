@@ -11,7 +11,7 @@ const TrendingGenres = ({ onGenreClick }) => {
 
   const fetchTrendingGenres = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/analytics/trending-genres?limit=8');
+      const response = await axios.get('http:
       setTrendingGenres(response.data.trending_genres || []);
     } catch (error) {
       console.error('Error fetching trending genres:', error);

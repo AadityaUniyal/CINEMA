@@ -17,7 +17,7 @@ from user_auth import UserAuth
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = Config.JWT_SECRET_KEY
-CORS(app, supports_credentials=True)
+CORS(app, supports_credentials=True, origins=['*'])
 
 print("Initializing application...")
 data_processor = DataProcessor(use_mongodb=False)

@@ -33,7 +33,7 @@ function App() {
     setIsLoggedIn(true);
 
     try {
-      const response = await fetch(`http:
+      const response = await fetch(`http://localhost:5000/api/auth/profile/${id}`);
       const data = await response.json();
       
       if (data.success && data.profile) {

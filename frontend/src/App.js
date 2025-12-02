@@ -8,6 +8,7 @@ import Dashboard from './components/Dashboard';
 import Watchlist from './components/Watchlist';
 import RandomMovies from './components/RandomMovies';
 import Analytics from './components/Analytics';
+import TrainingDashboard from './components/TrainingDashboard';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -137,6 +138,12 @@ function App() {
             >
               Dashboard
             </button>
+            <button 
+              onClick={() => handleTabChange('ml-training')} 
+              className={activeTab === 'ml-training' ? 'active' : ''}
+            >
+              ML Training
+            </button>
           </nav>
         </div>
       </header>
@@ -148,6 +155,7 @@ function App() {
         {activeTab === 'analytics' && <Analytics />}
         {activeTab === 'watchlist' && <Watchlist userId={userId} key={userId} />}
         {activeTab === 'dashboard' && <Dashboard userId={userId} key={userId} />}
+        {activeTab === 'ml-training' && <TrainingDashboard />}
       </main>
     </div>
   );

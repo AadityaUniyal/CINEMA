@@ -177,6 +177,12 @@ def rate_movie():
         }
         user_ratings_collection.insert_one(rating_doc)
     
+    if realtime_learner and ml_model:
+        try:
+            realtime_learner.update_user_embedding(user_id, movie_id, rating)
+        except Exception as e:
+            print(f"Real-time learning error: {e}")
+    
     return jsonify({'success': True, 'message': 'Rating submitted'})
 
 @app.route('/api/user/<int:user_id>/stats', methods=['GET'])
@@ -577,3 +583,223 @@ if __name__ == '__main__':
     print(f"Loaded {len(data_processor.movies)} movies")
     print(f"Loaded {len(data_processor.ratings)} ratings")
     app.run(debug=True, port=5000)
+
+
+from ml.training_service import TrainingService
+from ml.ml_model_manager import MLModelManager
+from ml.evaluation_service import EvaluationService
+from ml.explainer_service import ExplainerService
+from ml.realtime_learner import RealtimeLearner
+
+ml_model_manager = MLModelManager()
+training_service = TrainingService()
+evaluation_service = EvaluationService()
+
+ml_model = None
+realtime_learner = None
+explainer_service = None
+
+def load_ml_model():
+    global ml_model, realtime_learner, explainer_service
+    ml_model = ml_model_manager.load_model('matrix_factorization', 'latest')
+    if ml_model:
+        realtime_learner = RealtimeLearner(ml_model)
+        explainer_service = ExplainerService(ml_model, data_processor)
+        print("✅ ML model loaded successfully!")
+    else:
+        print("⚠️  No ML model found. Train a model first.")
+
+load_ml_model()
+
+@app.route('/api/ml/train', methods=['POST'])
+def train_ml_model():
+    try:
+        data = request.json or {}
+        model_type = data.get('model_type', 'matrix_factorization')
+        hyperparams = data.get('hyperparams')
+        
+        ratings_df = data_processor.ratings
+        
+        if len(ratings_df) < 100:
+            return jsonify({'error': 'Insufficient data for training (minimum 100 ratings required)'}), 400
+        
+        model, train_df, test_df = training_service.train_model(model_type, ratings_df, hyperparams)
+        
+        metrics = evaluation_service.evaluate_model(model, test_df)
+        
+        metadata = {
+            'hyperparameters': hyperparams or {},
+            'metrics': metrics,
+            'training_data': {
+                'n_users': len(train_df['userId'].unique()),
+                'n_movies': len(train_df['movieId'].unique()),
+                'n_ratings': len(train_df)
+            }
+        }
+        
+        version = ml_model_manager.save_model(model, model_type, metadata)
+        
+        load_ml_model()
+        
+        return jsonify({
+            'success': True,
+            'version': version,
+            'metrics': metrics
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/ml/retrain', methods=['POST'])
+def retrain_ml_models():
+    try:
+        ratings_df = data_processor.ratings
+        results = training_service.retrain_all_models(ratings_df)
+        
+        load_ml_model()
+        
+        return jsonify({
+            'success': True,
+            'results': results
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/ml/training-status', methods=['GET'])
+def get_training_status():
+    versions = ml_model_manager.list_versions('matrix_factorization')
+    
+    return jsonify({
+        'model_count': len(versions),
+        'latest_version': versions[-1] if versions else None,
+        'all_versions': versions
+    })
+
+@app.route('/api/ml/recommendations/<int:user_id>', methods=['GET'])
+def get_ml_recommendations(user_id):
+    if not ml_model:
+        return jsonify({'error': 'ML model not loaded'}), 503
+    
+    try:
+        n = int(request.args.get('n', 10))
+        
+        user_ratings = data_processor.ratings[data_processor.ratings['userId'] == user_id]
+        rated_movies = user_ratings['movieId'].tolist()
+        
+        recommended_ids = ml_model.recommend(user_id, n=n, exclude_rated=True, rated_movies=rated_movies)
+        
+        recommended_movies = data_processor.movies[
+            data_processor.movies['movieId'].isin(recommended_ids)
+        ]
+        
+        movies_with_stats = data_processor.get_movie_stats()
+        result = recommended_movies.merge(
+            movies_with_stats[['movieId', 'avg_rating', 'rating_count']],
+            on='movieId',
+            how='left'
+        )
+        
+        return jsonify({
+            'user_id': user_id,
+            'recommendations': result.to_dict('records'),
+            'model_version': 'latest'
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/ml/predict', methods=['POST'])
+def predict_rating():
+    if not ml_model:
+        return jsonify({'error': 'ML model not loaded'}), 503
+    
+    try:
+        data = request.json
+        user_id = data.get('userId')
+        movie_id = data.get('movieId')
+        
+        if not user_id or not movie_id:
+            return jsonify({'error': 'userId and movieId required'}), 400
+        
+        prediction = ml_model.predict(user_id, movie_id)
+        
+        return jsonify({
+            'userId': user_id,
+            'movieId': movie_id,
+            'predicted_rating': float(prediction)
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/ml/explain/<int:user_id>/<int:movie_id>', methods=['GET'])
+def explain_recommendation(user_id, movie_id):
+    if not explainer_service:
+        return jsonify({'error': 'Explainer service not available'}), 503
+    
+    try:
+        explanation = explainer_service.explain_recommendation(user_id, movie_id)
+        return jsonify(explanation)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/ml/metrics', methods=['GET'])
+def get_ml_metrics():
+    versions = ml_model_manager.list_versions('matrix_factorization')
+    
+    if not versions:
+        return jsonify({'error': 'No models found'}), 404
+    
+    latest = versions[-1]
+    return jsonify({
+        'current_version': latest.get('version'),
+        'metrics': latest.get('metrics', {}),
+        'trained_at': latest.get('saved_at')
+    })
+
+@app.route('/api/ml/metrics/history', methods=['GET'])
+def get_metrics_history():
+    versions = ml_model_manager.list_versions('matrix_factorization')
+    
+    history = []
+    for v in versions:
+        if 'metrics' in v:
+            history.append({
+                'version': v['version'],
+                'saved_at': v['saved_at'],
+                'metrics': v['metrics']
+            })
+    
+    return jsonify({'history': history})
+
+@app.route('/api/ml/models', methods=['GET'])
+def list_ml_models():
+    versions = ml_model_manager.list_versions('matrix_factorization')
+    return jsonify({'models': versions})
+
+@app.route('/api/ml/models/activate/<version>', methods=['POST'])
+def activate_model(version):
+    try:
+        model = ml_model_manager.load_model('matrix_factorization', version)
+        if not model:
+            return jsonify({'error': 'Model not found'}), 404
+        
+        global ml_model, realtime_learner, explainer_service
+        ml_model = model
+        realtime_learner = RealtimeLearner(ml_model)
+        explainer_service = ExplainerService(ml_model, data_processor)
+        
+        return jsonify({
+            'success': True,
+            'message': f'Model {version} activated'
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/ml/models/<version>', methods=['DELETE'])
+def delete_model(version):
+    try:
+        ml_model_manager.delete_model('matrix_factorization', version)
+        return jsonify({
+            'success': True,
+            'message': f'Model {version} deleted'
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500

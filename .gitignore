@@ -76,3 +76,9 @@ htmlcov/
 # OS
 Thumbs.db
 .DS_Store
+
+# ML Models
+backend/models/
+*.pkl
+*.h5
+*.npy

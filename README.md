@@ -7,6 +7,8 @@ A premium Netflix-style movie recommendation platform with machine learning-powe
 ![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-green.svg)
 ![License](https://img.shields.io/badge/License-MIT-yellow.svg)
 
+> **Note:** Currently running in CSV-only mode. All core features (movie browsing, search, ML recommendations, analytics) work perfectly. MongoDB features (user auth, persistent ratings) are optional.
+
 ## ✨ Features
 
 ### 🔐 User Authentication

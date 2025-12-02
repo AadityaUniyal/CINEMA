@@ -23,7 +23,14 @@ print("Initializing application...")
 data_processor = DataProcessor(use_mongodb=False)
 ml_engine = RecommendationEngine(data_processor)
 try:
-    mongo_client = MongoClient(Config.MONGO_URI, serverSelectionTimeoutMS=2000)
+    import ssl
+    import certifi
+    mongo_client = MongoClient(
+        Config.MONGO_URI,
+        serverSelectionTimeoutMS=5000,
+        tls=True,
+        tlsCAFile=certifi.where()
+    )
     mongo_client.server_info()
     db = mongo_client[Config.DB_NAME]
     user_ratings_collection = db['user_ratings']
@@ -35,6 +42,17 @@ try:
     print("✅ MongoDB connected successfully!")
 except Exception as e:
     print(f"⚠️  MongoDB not available: {e}")
+    try:
+        import ssl as _ssl
+        print('SSL library version:', getattr(_ssl, 'OPENSSL_VERSION', 'unknown'))
+    except Exception:
+        pass
+    # Print proxy environment variables that may interfere with TLS
+    import os as _os
+    for var in ('HTTP_PROXY', 'http_proxy', 'HTTPS_PROXY', 'https_proxy'):
+        val = _os.getenv(var)
+        if val:
+            print(f'Env {var}={val}')
     print("⚠️  Running in CSV-only mode (auth features disabled)")
     db = None
     watchlist_manager = WatchlistManager(None)

@@ -30,3 +30,5 @@ redis==5.0.1
 # Testing
 hypothesis==6.92.0           # Property-based testing
 pytest==7.4.3                # Unit testing
+certifi
+dnspython

@@ -18,10 +18,10 @@ const Dashboard = ({ userId }) => {
     setLoading(true);
     try {
       const [statsRes, reviewsRes, watchlistRes, profileRes] = await Promise.all([
-        axios.get(`http:
-        axios.get(`http:
-        axios.get(`http:
-        axios.get(`http:
+        axios.get(`http://localhost:5000/api/user/${userId}/stats`),
+        axios.get(`http://localhost:5000/api/reviews/user/${userId}`),
+        axios.get(`http://localhost:5000/api/watchlist/${userId}`),
+        axios.get(`http://localhost:5000/api/auth/profile/${userId}`)
       ]);
 
       setUserStats(statsRes.data || {

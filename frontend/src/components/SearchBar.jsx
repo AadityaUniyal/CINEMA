@@ -29,7 +29,7 @@ const SearchBar = ({ onSearch }) => {
       }
 
       try {
-        const response = await axios.get(`http:
+        const response = await axios.get(`http://localhost:5000/api/search?q=${query}&limit=5`);
         setSuggestions(response.data.results || []);
         setShowSuggestions(true);
       } catch (error) {
@@ -48,7 +48,7 @@ const SearchBar = ({ onSearch }) => {
     setIsSearching(true);
     setShowSuggestions(false);
     try {
-      const response = await axios.get(`http:
+      const response = await axios.get(`http://localhost:5000/api/search?q=${query}`);
       onSearch(response.data.results);
     } catch (error) {
       console.error('Search error:', error);

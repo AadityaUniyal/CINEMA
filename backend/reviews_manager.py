@@ -1,4 +1,4 @@
-Movie Reviews and Comments Manager
+"""Movie Reviews and Comments Manager"""
 from datetime import datetime
 from pymongo import DESCENDING
 

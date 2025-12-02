@@ -1,4 +1,4 @@
-User Authentication and Registration System
+"""User Authentication and Registration System"""
 from pymongo import MongoClient
 from config import Config
 import hashlib
@@ -39,11 +39,13 @@ class UserAuth:
         return re.match(pattern, email) is not None
     
     def _validate_password(self, password):
+        """
         Validate password:
         - At least 8 characters
         - At least one uppercase letter
         - At least one lowercase letter
         - At least one number
+        """
         if len(password) < 8:
             return False, "Password must be at least 8 characters long"
         if not re.search(r'[A-Z]', password):
@@ -62,8 +64,10 @@ class UserAuth:
         return True, "Valid"
     
     def register_user(self, name, email, password):
+        """
         Register a new user
         Returns: (success, message, user_id)
+        """
         if not self.users_collection:
             return False, "Database not available", None
         
@@ -118,8 +122,10 @@ class UserAuth:
             return False, f"Registration failed: {str(e)}", None
     
     def login_user(self, email, password):
+        """
         Login user
         Returns: (success, message, user_id, user_data)
+        """
         if not self.users_collection:
             return False, "Database not available", None, None
         

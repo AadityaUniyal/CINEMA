@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const MovieCard = ({ movie, userId, onUpdate }) => {
+const MovieCard = ({ movie, userId, onUpdate, showConfidence = false }) => {
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [showRating, setShowRating] = useState(false);
@@ -12,6 +12,9 @@ const MovieCard = ({ movie, userId, onUpdate }) => {
   const [reviews, setReviews] = useState([]);
   const [isInWatchlist, setIsInWatchlist] = useState(false);
   const [watchlistLoading, setWatchlistLoading] = useState(false);
+  const [showExplanation, setShowExplanation] = useState(false);
+  const [explanation, setExplanation] = useState(null);
+  const [loadingExplanation, setLoadingExplanation] = useState(false);
 
   const submitRatingAndComment = async () => {
     if (rating === 0 || isSubmitting) return;
@@ -19,14 +22,14 @@ const MovieCard = ({ movie, userId, onUpdate }) => {
     setIsSubmitting(true);
     try {
       
-      await axios.post('http:
+      await axios.post('http://localhost:5000/api/rate', {
         userId,
         movieId: movie.movieId,
         rating
       });
 
       if (comment.trim()) {
-        await axios.post('http:
+        await axios.post('http://localhost:5000/api/reviews', {
           userId,
           movieId: movie.movieId,
           rating,
@@ -48,7 +51,7 @@ const MovieCard = ({ movie, userId, onUpdate }) => {
 
   const loadReviews = async () => {
     try {
-      const response = await axios.get(`http:
+      const response = await axios.get(`http://localhost:5000/api/reviews/${movie.movieId}`);
       setReviews(response.data.reviews || []);
       setShowReviews(true);
     } catch (error) {
@@ -72,10 +75,10 @@ const MovieCard = ({ movie, userId, onUpdate }) => {
     setWatchlistLoading(true);
     try {
       if (isInWatchlist) {
-        await axios.delete(`http:
+        await axios.delete(`http://localhost:5000/api/watchlist/${userId}/${movie.movieId}`);
         setIsInWatchlist(false);
       } else {
-        await axios.post(`http:
+        await axios.post(`http://localhost:5000/api/watchlist/${userId}/${movie.movieId}`);
         setIsInWatchlist(true);
       }
       if (onUpdate) onUpdate();
@@ -83,6 +86,26 @@ const MovieCard = ({ movie, userId, onUpdate }) => {
       console.error('Failed to update watchlist:', error);
     } finally {
       setWatchlistLoading(false);
+    }
+  };
+
+  const loadExplanation = async () => {
+    if (explanation) {
+      setShowExplanation(!showExplanation);
+      return;
+    }
+    
+    setLoadingExplanation(true);
+    try {
+      const response = await axios.get(`http://localhost:5000/api/ml/explain/${userId}/${movie.movieId}`);
+      setExplanation(response.data);
+      setShowExplanation(true);
+    } catch (error) {
+      console.error('Failed to load explanation:', error);
+      setExplanation({ error: 'Unable to load explanation' });
+      setShowExplanation(true);
+    } finally {
+      setLoadingExplanation(false);
     }
   };
 
@@ -100,6 +123,13 @@ const MovieCard = ({ movie, userId, onUpdate }) => {
           <span className="rating-badge">⭐ {movie.avg_rating?.toFixed(1) || 'N/A'}</span>
           <span className="rating-count">{movie.rating_count || 0} ratings</span>
         </div>
+
+        {showConfidence && movie.confidence && (
+          <div className="confidence-score">
+            <span className="confidence-label">Predicted for you:</span>
+            <span className="confidence-value">⭐ {movie.confidence.toFixed(1)}</span>
+          </div>
+        )}
 
         <div className="movie-actions">
           <button 
@@ -132,6 +162,18 @@ const MovieCard = ({ movie, userId, onUpdate }) => {
           >
             💬 Reviews
           </button>
+          {showConfidence && movie.mlBased && (
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                loadExplanation();
+              }} 
+              className="action-btn explain-btn"
+              disabled={loadingExplanation}
+            >
+              {loadingExplanation ? '⏳' : '💡'} Why?
+            </button>
+          )}
         </div>
 
         {showRating && (
@@ -203,6 +245,64 @@ const MovieCard = ({ movie, userId, onUpdate }) => {
                 ))
               )}
             </div>
+          </div>
+        )}
+
+        {showExplanation && explanation && (
+          <div className="explanation-section">
+            <div className="explanation-header">
+              <h4>💡 Why Recommended</h4>
+              <button onClick={() => setShowExplanation(false)} className="close-btn">✕</button>
+            </div>
+            {explanation.error ? (
+              <p className="explanation-error">{explanation.error}</p>
+            ) : (
+              <div className="explanation-content">
+                {explanation.reasons && explanation.reasons.length > 0 ? (
+                  explanation.reasons.map((reason, idx) => (
+                    <div key={idx} className="explanation-reason">
+                      <h5 className="reason-title">
+                        {reason.type === 'similar_movies' && '🎬 Similar Movies'}
+                        {reason.type === 'genre_match' && '🎭 Genre Match'}
+                        {reason.type === 'similar_users' && '👥 Similar Users'}
+                      </h5>
+                      <p className="reason-description">{reason.description}</p>
+                      
+                      {reason.type === 'similar_movies' && reason.movies && (
+                        <div className="similar-movies-list">
+                          {reason.movies.map((m, i) => (
+                            <div key={i} className="similar-movie-item">
+                              <span className="movie-name">{m.title}</span>
+                              <span className="your-rating">Your rating: ⭐ {m.your_rating}</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      
+                      {reason.type === 'genre_match' && reason.genres && (
+                        <div className="genre-list">
+                          <span className="genres-text">{reason.genres.join(', ')}</span>
+                          {reason.match_score && (
+                            <span className="match-score">Match: {(reason.match_score * 100).toFixed(0)}%</span>
+                          )}
+                        </div>
+                      )}
+                      
+                      {reason.type === 'similar_users' && (
+                        <div className="similar-users-info">
+                          <span>{reason.similar_user_count} users with similar taste</span>
+                          {reason.avg_rating && (
+                            <span className="avg-rating">Avg rating: ⭐ {reason.avg_rating.toFixed(1)}</span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <p className="no-explanation">No detailed explanation available</p>
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>

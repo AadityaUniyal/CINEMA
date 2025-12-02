@@ -14,7 +14,7 @@ const GenrePreference = ({ userId, onComplete }) => {
 
   const fetchGenres = async () => {
     try {
-      const response = await axios.get('http:
+      const response = await axios.get('http://localhost:5000/api/genres');
       setGenres(response.data.genres || []);
     } catch (error) {
       console.error('Error fetching genres:', error);
@@ -39,7 +39,7 @@ const GenrePreference = ({ userId, onComplete }) => {
 
     setSaving(true);
     try {
-      await axios.post('http:
+      await axios.post('http://localhost:5000/api/user/preferences', {
         userId,
         preferredGenres: selectedGenres
       });

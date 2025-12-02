@@ -20,11 +20,11 @@ const Analytics = () => {
   const fetchAnalytics = async () => {
     try {
       const [genreRes, ratingRes, trendsRes, topRatedRes, activityRes] = await Promise.all([
-        axios.get('http:
-        axios.get('http:
-        axios.get('http:
-        axios.get('http:
-        axios.get('http:
+        axios.get('http://localhost:5000/api/analytics/genre-distribution'),
+        axios.get('http://localhost:5000/api/analytics/rating-distribution'),
+        axios.get('http://localhost:5000/api/analytics/trends'),
+        axios.get('http://localhost:5000/api/analytics/top-rated'),
+        axios.get('http://localhost:5000/api/analytics/user-activity')
       ]);
 
       const genres = Object.keys(genreRes.data.distribution).slice(0, 10);

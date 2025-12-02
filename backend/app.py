@@ -578,6 +578,128 @@ def save_user_preferences():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+# Hyperparameter Tuning Endpoints
+@app.route('/api/ml/hyperparameters/default/<model_type>', methods=['GET'])
+def get_default_hyperparameters(model_type):
+    """Get default hyperparameters for a model type"""
+    try:
+        from ml.hyperparameter_tuner import HyperparameterTuner
+        tuner = HyperparameterTuner()
+        default_params = tuner.get_default_hyperparams(model_type)
+        return jsonify({
+            'model_type': model_type,
+            'hyperparameters': default_params
+        }), 200
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/ml/hyperparameters/ranges/<model_type>', methods=['GET'])
+def get_hyperparameter_ranges(model_type):
+    """Get valid parameter ranges for a model type"""
+    try:
+        from ml.hyperparameter_tuner import HyperparameterTuner
+        tuner = HyperparameterTuner()
+        ranges = tuner.get_param_ranges(model_type)
+        return jsonify({
+            'model_type': model_type,
+            'ranges': ranges
+        }), 200
+    except ValueError as e:
+        return jsonify({'error': str(e)}), 400
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/ml/hyperparameters/validate', methods=['POST'])
+def validate_hyperparameters():
+    """Validate hyperparameters against configured ranges"""
+    try:
+        data = request.get_json()
+        model_type = data.get('model_type')
+        hyperparams = data.get('hyperparameters')
+        
+        if not model_type or not hyperparams:
+            return jsonify({'error': 'model_type and hyperparameters required'}), 400
+        
+        from ml.hyperparameter_tuner import HyperparameterTuner
+        tuner = HyperparameterTuner()
+        is_valid, errors = tuner.validate_hyperparams(model_type, hyperparams)
+        
+        return jsonify({
+            'valid': is_valid,
+            'errors': errors
+        }), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/ml/hyperparameters/tune', methods=['POST'])
+def tune_hyperparameters():
+    """Run grid search to find optimal hyperparameters"""
+    try:
+        data = request.get_json()
+        model_type = data.get('model_type', 'matrix_factorization')
+        n_splits = data.get('n_splits', 5)
+        
+        from ml.hyperparameter_tuner import HyperparameterTuner
+        tuner = HyperparameterTuner()
+        
+        # Load ratings data
+        if db:
+            ratings_cursor = user_ratings_collection.find({})
+            ratings_list = list(ratings_cursor)
+            if ratings_list:
+                ratings_df = pd.DataFrame(ratings_list)
+            else:
+                ratings_df = data_processor.ratings
+        else:
+            ratings_df = data_processor.ratings
+        
+        # Run grid search
+        results = tuner.grid_search(model_type, ratings_df, n_splits)
+        
+        # Save best configs
+        tuner.save_best_configs()
+        
+        return jsonify({
+            'success': True,
+            'best_config': results['best_config'],
+            'best_score': results['best_score'],
+            'n_configurations_tested': len(results['all_results'])
+        }), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/ml/hyperparameters/best/<model_type>', methods=['GET'])
+def get_best_hyperparameters(model_type):
+    """Get the best known hyperparameters for a model type"""
+    try:
+        from ml.hyperparameter_tuner import HyperparameterTuner
+        tuner = HyperparameterTuner()
+        tuner.load_best_configs()
+        best_config = tuner.get_best_config(model_type)
+        
+        return jsonify({
+            'model_type': model_type,
+            'hyperparameters': best_config
+        }), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/ml/hyperparameters/history', methods=['GET'])
+def get_tuning_history():
+    """Get history of hyperparameter tuning sessions"""
+    try:
+        from ml.hyperparameter_tuner import HyperparameterTuner
+        tuner = HyperparameterTuner()
+        tuner.load_best_configs()
+        
+        return jsonify({
+            'history': tuner.tuning_history
+        }), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 if __name__ == '__main__':
     print("Starting Flask server...")
     print(f"Loaded {len(data_processor.movies)} movies")
@@ -590,7 +712,10 @@ from ml.ml_model_manager import MLModelManager
 from ml.evaluation_service import EvaluationService
 from ml.explainer_service import ExplainerService
 from ml.realtime_learner import RealtimeLearner
+from ml.ml_logger import get_ml_logger
+from scheduler import TrainingScheduler
 
+ml_logger = get_ml_logger('app')
 ml_model_manager = MLModelManager()
 training_service = TrainingService()
 evaluation_service = EvaluationService()
@@ -598,6 +723,7 @@ evaluation_service = EvaluationService()
 ml_model = None
 realtime_learner = None
 explainer_service = None
+training_scheduler = None
 
 def load_ml_model():
     global ml_model, realtime_learner, explainer_service
@@ -609,7 +735,21 @@ def load_ml_model():
     else:
         print("⚠️  No ML model found. Train a model first.")
 
+def initialize_training_scheduler():
+    global training_scheduler
+    training_scheduler = TrainingScheduler(
+        training_service, 
+        data_processor, 
+        ml_model_manager,
+        evaluation_service,
+        ml_logger
+    )
+    training_scheduler.schedule_weekly_training(day_of_week=6, hour=2, minute=0)
+    training_scheduler.start()
+    print("✅ Training scheduler initialized")
+
 load_ml_model()
+initialize_training_scheduler()
 
 @app.route('/api/ml/train', methods=['POST'])
 def train_ml_model():
@@ -668,11 +808,53 @@ def retrain_ml_models():
 def get_training_status():
     versions = ml_model_manager.list_versions('matrix_factorization')
     
+    scheduler_status = None
+    if training_scheduler:
+        scheduler_status = training_scheduler.get_training_status()
+    
     return jsonify({
         'model_count': len(versions),
         'latest_version': versions[-1] if versions else None,
-        'all_versions': versions
+        'all_versions': versions,
+        'scheduler_status': scheduler_status
     })
+
+@app.route('/api/ml/train/trigger', methods=['POST'])
+def trigger_manual_training():
+    """Manually trigger a training session."""
+    if not training_scheduler:
+        return jsonify({'error': 'Training scheduler not initialized'}), 503
+    
+    result = training_scheduler.trigger_manual_training()
+    
+    if result['success']:
+        return jsonify(result), 202  # 202 Accepted - processing in background
+    else:
+        return jsonify(result), 409  # 409 Conflict - training already in progress
+
+@app.route('/api/ml/training/history', methods=['GET'])
+def get_training_history():
+    """Get training history with before/after metrics."""
+    if not training_scheduler:
+        return jsonify({'error': 'Training scheduler not initialized'}), 503
+    
+    limit = request.args.get('limit', type=int)
+    history = training_scheduler.history_manager.get_training_history(limit=limit)
+    
+    return jsonify({
+        'history': history,
+        'count': len(history)
+    })
+
+@app.route('/api/ml/training/statistics', methods=['GET'])
+def get_training_statistics():
+    """Get training statistics."""
+    if not training_scheduler:
+        return jsonify({'error': 'Training scheduler not initialized'}), 503
+    
+    stats = training_scheduler.history_manager.get_training_statistics()
+    
+    return jsonify(stats)
 
 @app.route('/api/ml/recommendations/<int:user_id>', methods=['GET'])
 def get_ml_recommendations(user_id):

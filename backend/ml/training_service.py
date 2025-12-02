@@ -3,6 +3,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from ml.matrix_factorization import MatrixFactorizationModel
 from ml.ml_model_manager import MLModelManager
+from ml.hyperparameter_tuner import HyperparameterTuner
 from ml.ml_logger import get_ml_logger
 
 logger = get_ml_logger('training_service')
@@ -10,6 +11,7 @@ logger = get_ml_logger('training_service')
 class TrainingService:
     def __init__(self):
         self.model_manager = MLModelManager()
+        self.tuner = HyperparameterTuner()
         
     def prepare_data(self, ratings_df, test_size=0.2, random_state=42):
         logger.info(f"Preparing data: {len(ratings_df)} total ratings")
@@ -37,14 +39,13 @@ class TrainingService:
     
     def _train_matrix_factorization(self, train_df, hyperparams=None):
         if hyperparams is None:
-            hyperparams = {
-                'n_factors': 50,
-                'learning_rate': 0.01,
-                'regularization': 0.02,
-                'epochs': 20
-            }
+            # Try to load best known configuration, fall back to default
+            hyperparams = self.tuner.get_best_config('matrix_factorization')
         
-        self._validate_hyperparams(hyperparams)
+        # Validate using tuner
+        is_valid, errors = self.tuner.validate_hyperparams('matrix_factorization', hyperparams)
+        if not is_valid:
+            raise ValueError(f"Invalid hyperparameters: {', '.join(errors)}")
         
         model = MatrixFactorizationModel(**hyperparams)
         training_history = model.fit(train_df)

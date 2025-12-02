@@ -1,0 +1,42 @@
+{
+  "user_feature_params": {
+    "avg_rating_mean": 3.9722222222222228,
+    "avg_rating_std": 0.6472877887628358,
+    "rating_std_mean": 0.7004977238376293,
+    "rating_std_std": 0.6067298204424416,
+    "rating_count_mean": 2.0,
+    "rating_count_std": 1.0
+  },
+  "movie_feature_params": {
+    "rating_count_mean": 1.5,
+    "rating_count_std": 0.5773502691896257,
+    "avg_rating_mean": 3.875,
+    "avg_rating_std": 1.050793351076541,
+    "rating_std_mean": 0.35355339059327373,
+    "rating_std_std": 0.49999999999999994
+  },
+  "genre_list": [
+    "Action",
+    "Adventure",
+    "Comedy",
+    "Drama",
+    "Sci-Fi"
+  ],
+  "version": "1.0.0",
+  "feature_extraction_config": {
+    "user_features": [
+      "avg_rating",
+      "rating_std",
+      "rating_count",
+      "min_rating",
+      "max_rating",
+      "genre_preferences"
+    ],
+    "movie_features": [
+      "rating_count",
+      "avg_rating",
+      "rating_std",
+      "genre_embedding"
+    ]
+  }
+}

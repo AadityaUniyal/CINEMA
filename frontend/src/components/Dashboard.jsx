@@ -35,7 +35,7 @@ const Dashboard = ({ userId }) => {
       if (reviews.length > 0) {
         const movieIds = reviews.map(r => r.movieId);
         try {
-          const moviesRes = await axios.get('http:
+          const moviesRes = await axios.get('http://localhost:5000/api/movies', {
             params: { per_page: 1000 }
           });
           const moviesMap = {};

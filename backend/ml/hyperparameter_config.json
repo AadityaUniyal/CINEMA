@@ -1,0 +1,95 @@
+{
+  "matrix_factorization": {
+    "default": {
+      "n_factors": 50,
+      "learning_rate": 0.01,
+      "regularization": 0.02,
+      "epochs": 20
+    },
+    "ranges": {
+      "n_factors": {
+        "min": 1,
+        "max": 200,
+        "type": "int"
+      },
+      "learning_rate": {
+        "min": 0.0001,
+        "max": 1.0,
+        "type": "float"
+      },
+      "regularization": {
+        "min": 0.0,
+        "max": 1.0,
+        "type": "float"
+      },
+      "epochs": {
+        "min": 1,
+        "max": 100,
+        "type": "int"
+      }
+    },
+    "search_space": [
+      {
+        "n_factors": 30,
+        "learning_rate": 0.005,
+        "regularization": 0.01,
+        "epochs": 20
+      },
+      {
+        "n_factors": 50,
+        "learning_rate": 0.01,
+        "regularization": 0.02,
+        "epochs": 20
+      },
+      {
+        "n_factors": 70,
+        "learning_rate": 0.015,
+        "regularization": 0.03,
+        "epochs": 20
+      },
+      {
+        "n_factors": 100,
+        "learning_rate": 0.01,
+        "regularization": 0.02,
+        "epochs": 30
+      }
+    ]
+  },
+  "neural_cf": {
+    "default": {
+      "embedding_dim": 32,
+      "hidden_layers": [64, 32, 16],
+      "dropout": 0.2,
+      "learning_rate": 0.001,
+      "batch_size": 256,
+      "epochs": 20
+    },
+    "ranges": {
+      "embedding_dim": {
+        "min": 8,
+        "max": 128,
+        "type": "int"
+      },
+      "dropout": {
+        "min": 0.0,
+        "max": 0.5,
+        "type": "float"
+      },
+      "learning_rate": {
+        "min": 0.0001,
+        "max": 0.01,
+        "type": "float"
+      },
+      "batch_size": {
+        "min": 32,
+        "max": 512,
+        "type": "int"
+      },
+      "epochs": {
+        "min": 5,
+        "max": 50,
+        "type": "int"
+      }
+    }
+  }
+}

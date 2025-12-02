@@ -1,6 +1,6 @@
-# 🎬 CINÉMA - AI-Powered Movie Recommendation Platform
+# 🎬 CINÉMA - Movie Recommendation Platform
 
-A premium Netflix-style movie recommendation platform with ML-powered suggestions, user authentication, personalized dashboards, and real-time reviews.
+A premium Netflix-style movie recommendation platform with machine learning-powered suggestions, user authentication, personalized dashboards, and real-time reviews.
 
 ![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
 ![React](https://img.shields.io/badge/React-18.0+-61DAFB.svg)
@@ -51,7 +51,7 @@ A premium Netflix-style movie recommendation platform with ML-powered suggestion
 - Watchlist management
 - Activity summary
 
-### 🎯 ML-Powered Recommendations
+### 🎯 Smart Recommendations
 - Hybrid collaborative + content-based filtering
 - Personalized based on your ratings
 - Filtered by preferred genres
@@ -228,6 +228,7 @@ cinema/
 
 ### Recommendations
 - `GET /api/recommendations/:userId` - Get personalized recommendations
+- `GET /api/ml/recommendations/:userId` - Get ML-based recommendations
 - `GET /api/similar-users/:userId` - Find similar users
 
 ### Reviews
@@ -305,9 +306,6 @@ python test_new_features.py
 ## 📝 Documentation
 
 - `README.md` - Main documentation (this file)
-- `QUICK_GUIDE.md` - Quick user guide
-- `API_REFERENCE.md` - Complete API documentation
-- `ARCHITECTURE.md` - System architecture
 - `DEPLOYMENT.md` - Production deployment guide
 
 ---
@@ -382,7 +380,7 @@ Browse 20,000+ movies with search, filters, and trending genres.
 Personal dashboard with statistics, reviews, and watchlist.
 
 ### Recommendations
-ML-powered personalized movie recommendations.
+Personalized movie recommendations based on your preferences.
 
 ---
 
@@ -394,18 +392,18 @@ ML-powered personalized movie recommendations.
 ## 🤖 Machine Learning Features
 
 ### Advanced Recommendation System
-- **Matrix Factorization** - SVD-based collaborative filtering with 50-dimensional embeddings
-- **Real-time Learning** - Instant preference updates when you rate movies
-- **Explainable AI** - See why movies are recommended to you
-- **Model Versioning** - Save and compare different model versions
-- **Performance Metrics** - RMSE, Precision@K, Recall@K, Coverage
+- **Matrix Factorization** - SVD-based collaborative filtering
+- **Real-time Learning** - Updates instantly when you rate movies
+- **Recommendation Explanations** - Understand why movies are suggested
+- **Model Versioning** - Track and compare different model versions
+- **Performance Metrics** - RMSE, Precision, Recall, Coverage tracking
 
 ### ML API Endpoints
 ```bash
 # Train a new model
 POST /api/ml/train
 
-# Get ML-powered recommendations
+# Get recommendations
 GET /api/ml/recommendations/<user_id>?n=10
 
 # Get explanation for a recommendation
@@ -416,23 +414,23 @@ GET /api/ml/metrics
 ```
 
 ### Training Dashboard
-Access the ML Training Dashboard in the app to:
+Access the ML Training Dashboard to:
 - View current model performance
-- Train new models with one click
+- Train new models
 - See training history and metrics
 - Compare model versions
 
 ### How It Works
 1. **Matrix Factorization** decomposes user-movie ratings into latent factors
 2. **Gradient Descent** optimizes user and movie embeddings
-3. **Real-time Updates** adjust embeddings instantly when you rate
-4. **Explainer Service** analyzes why recommendations are made
+3. **Real-time Updates** adjust embeddings when you rate movies
+4. **Explanation System** shows why movies are recommended
 
 ---
 
-## 📊 ML Model Performance
+## 📊 Model Performance
 
-Current metrics on test data:
+Typical metrics on test data:
 - **RMSE**: ~0.87 (prediction accuracy)
 - **Precision@10**: ~65% (relevant recommendations)
 - **Recall@10**: ~42% (coverage of relevant items)
@@ -446,18 +444,18 @@ Current metrics on test data:
 - Python 3.8+
 - Flask (REST API)
 - MongoDB Atlas (Database)
-- TensorFlow/Scikit-learn (ML)
-- Matrix Factorization (Recommendation Algorithm)
+- Scikit-learn, TensorFlow (Machine Learning)
+- Matrix Factorization Algorithm
 
 **Frontend:**
 - React 18
 - Axios (API calls)
 - CSS3 (Netflix-inspired design)
 
-**ML/AI:**
+**Machine Learning:**
 - Matrix Factorization (SVD)
 - Real-time Learning
-- Explainable AI
+- Recommendation Explanations
 - Model Versioning
 
 ---

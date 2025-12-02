@@ -1,0 +1,11 @@
+{
+  "best_configs": {
+    "matrix_factorization": {
+      "n_factors": 70,
+      "learning_rate": 0.015,
+      "regularization": 0.03,
+      "epochs": 25
+    }
+  },
+  "tuning_history": []
+}

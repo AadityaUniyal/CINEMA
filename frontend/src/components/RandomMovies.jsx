@@ -15,7 +15,7 @@ const RandomMovies = ({ userId }) => {
 
   const fetchGenres = async () => {
     try {
-      const response = await axios.get('http:
+      const response = await axios.get('http://localhost:5000/api/genres');
       setGenres(response.data.genres);
     } catch (error) {
       console.error('Error fetching genres:', error);
@@ -28,7 +28,7 @@ const RandomMovies = ({ userId }) => {
       const params = { n: 24 };
       if (genre) params.genre = genre;
       
-      const response = await axios.get('http:
+      const response = await axios.get('http://localhost:5000/api/movies/random', { params });
       setMovies(response.data.movies);
     } catch (error) {
       console.error('Error fetching random movies:', error);

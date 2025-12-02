@@ -24,3 +24,30 @@ class Config:
     
     CACHE_TTL = 300
     ENABLE_CACHE = True
+    
+    # ML Model Storage Configuration
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    MODEL_STORAGE_ROOT = os.path.join(BASE_DIR, 'models')
+    MODEL_MATRIX_FACTORIZATION_PATH = os.path.join(MODEL_STORAGE_ROOT, 'matrix_factorization')
+    MODEL_NEURAL_CF_PATH = os.path.join(MODEL_STORAGE_ROOT, 'neural_cf')
+    MODEL_EMBEDDINGS_PATH = os.path.join(MODEL_STORAGE_ROOT, 'embeddings')
+    
+    # ML Logging Configuration
+    LOG_ROOT = os.path.join(BASE_DIR, 'logs')
+    ML_LOG_PATH = os.path.join(LOG_ROOT, 'ml')
+    
+    # ML Model Retention Policy
+    MAX_MODEL_VERSIONS = 10  # Keep last 10 versions per model type
+    MODEL_RETENTION_DAYS = 30  # Delete models older than 30 days
+    
+    # ML Training Configuration
+    ML_TRAINING_SCHEDULE_ENABLED = os.getenv('ML_TRAINING_SCHEDULE_ENABLED', 'true').lower() == 'true'
+    ML_TRAINING_DAY = int(os.getenv('ML_TRAINING_DAY', '6'))  # Sunday = 6
+    ML_TRAINING_HOUR = int(os.getenv('ML_TRAINING_HOUR', '2'))  # 2 AM
+    ML_TRAINING_MINUTE = int(os.getenv('ML_TRAINING_MINUTE', '0'))
+    
+    # ML Hyperparameters (defaults)
+    DEFAULT_N_FACTORS = 50
+    DEFAULT_LEARNING_RATE = 0.01
+    DEFAULT_REGULARIZATION = 0.02
+    DEFAULT_N_EPOCHS = 20

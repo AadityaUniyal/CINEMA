@@ -1976,3 +1976,234 @@ button {
     width: 100%;
   }
 }
+
+/* ML Recommendation Enhancements */
+.confidence-score {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: rgba(70, 211, 105, 0.1);
+  border-radius: 6px;
+  margin: 10px 0;
+  border: 1px solid rgba(70, 211, 105, 0.3);
+}
+
+.confidence-label {
+  font-size: 0.85rem;
+  color: var(--netflix-light-gray);
+  font-weight: 500;
+}
+
+.confidence-value {
+  font-size: 1rem;
+  color: #46d369;
+  font-weight: 700;
+}
+
+.explain-btn {
+  background: rgba(255, 193, 7, 0.2);
+  color: #ffc107;
+}
+
+.explain-btn:hover {
+  background: #ffc107;
+  color: var(--netflix-black);
+}
+
+.explanation-section {
+  margin-top: 15px;
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 193, 7, 0.3);
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.explanation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.explanation-header h4 {
+  font-size: 1.1rem;
+  color: #ffc107;
+}
+
+.explanation-content {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.explanation-reason {
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  border-left: 3px solid #ffc107;
+}
+
+.reason-title {
+  font-size: 1rem;
+  color: var(--netflix-white);
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.reason-description {
+  color: var(--netflix-light-gray);
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+
+.similar-movies-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.similar-movie-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+}
+
+.movie-name {
+  color: var(--netflix-white);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.your-rating {
+  color: #ffd700;
+  font-size: 0.85rem;
+}
+
+.genre-list {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  margin-top: 10px;
+}
+
+.genres-text {
+  color: var(--netflix-white);
+  font-size: 0.9rem;
+}
+
+.match-score {
+  color: #46d369;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.similar-users-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  margin-top: 10px;
+  color: var(--netflix-light-gray);
+  font-size: 0.9rem;
+}
+
+.avg-rating {
+  color: #ffd700;
+  font-weight: 600;
+}
+
+.explanation-error {
+  text-align: center;
+  color: var(--netflix-red);
+  padding: 20px;
+  font-style: italic;
+}
+
+.no-explanation {
+  text-align: center;
+  color: var(--netflix-light-gray);
+  padding: 20px;
+  font-style: italic;
+}
+
+.recommendation-confidence {
+  margin: 20px 0;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.recommendation-confidence.low {
+  border-color: rgba(255, 193, 7, 0.3);
+  background: rgba(255, 193, 7, 0.05);
+}
+
+.recommendation-confidence.medium {
+  border-color: rgba(33, 150, 243, 0.3);
+  background: rgba(33, 150, 243, 0.05);
+}
+
+.recommendation-confidence.high {
+  border-color: rgba(70, 211, 105, 0.3);
+  background: rgba(70, 211, 105, 0.05);
+}
+
+.confidence-indicator {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.confidence-icon {
+  font-size: 1.5rem;
+}
+
+.confidence-text {
+  font-size: 1rem;
+  color: var(--netflix-white);
+  font-weight: 500;
+}
+
+.rating-progress {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #ffc107 0%, #46d369 100%);
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+.recommendation-confidence.low .progress-bar {
+  background: #ffc107;
+}
+
+.recommendation-confidence.medium .progress-bar {
+  background: linear-gradient(90deg, #ffc107 0%, #2196f3 100%);
+}
+
+.recommendation-confidence.high .progress-bar {
+  background: #46d369;
+}

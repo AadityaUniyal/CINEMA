@@ -77,11 +77,20 @@ htmlcov/
 Thumbs.db
 .DS_Store
 
-# ML Models
-backend/models/
-*.pkl
-*.h5
-*.npy
+# ML Models and Training Artifacts
+backend/models/                    # Trained model storage directory
+backend/models/matrix_factorization/  # Matrix factorization models
+backend/models/neural_cf/         # Neural collaborative filtering models
+backend/models/embeddings/        # User and movie embeddings
+*.pkl                             # Pickle model files
+*.h5                              # Keras/TensorFlow model files
+*.npy                             # NumPy array files (embeddings)
+*.joblib                          # Joblib serialized files
+backend/ml/test_best_hyperparams.json  # Hyperparameter tuning results
+backend/models/test_*.json        # Test configuration files
+
+# ML Logs
+backend/logs/ml/*.log             # ML training and evaluation logs
 
 # Kiro Specs (local development only)
 .kiro/

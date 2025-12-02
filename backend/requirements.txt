@@ -1,17 +1,32 @@
+# Web Framework
 flask==3.0.0
 flask-cors==4.0.0
-pandas==2.2.0
-numpy==1.26.4
-scikit-learn==1.4.0
-pymongo==4.6.1
-python-dotenv==1.0.0
-pyjwt==2.8.0
-redis==5.0.1
 werkzeug==3.0.1
 gunicorn==21.2.0
+
+# Data Processing
+pandas==2.2.0
+numpy==1.26.4
+
+# Machine Learning - Core
+scikit-learn==1.4.0
 tensorflow==2.15.0
 scipy==1.12.0
-joblib==1.3.2
-scikit-surprise==1.1.3
-hypothesis==6.92.0
-pytest==7.4.3
+
+# Machine Learning - Utilities
+joblib==1.3.2                # Model serialization
+scikit-surprise==1.1.3       # Collaborative filtering baselines
+
+# Database
+pymongo==4.6.1
+
+# Authentication & Security
+pyjwt==2.8.0
+python-dotenv==1.0.0
+
+# Caching
+redis==5.0.1
+
+# Testing
+hypothesis==6.92.0           # Property-based testing
+pytest==7.4.3                # Unit testing

@@ -82,3 +82,6 @@ backend/models/
 *.pkl
 *.h5
 *.npy
+
+# Kiro Specs (local development only)
+.kiro/

@@ -205,6 +205,7 @@
 
   - [x] 12.3 Add model comparison view
 
+
     - Compare metrics across versions
     - Visualize performance trends
     - _Requirements: 8.2, 1.5_

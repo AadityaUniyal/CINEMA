@@ -17,10 +17,10 @@ from user_auth import UserAuth
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = Config.JWT_SECRET_KEY
-CORS(app, supports_credentials=True, origins=['*'])
+CORS(app, supports_credentials=True, origins=Config.CORS_ORIGINS)
 
 print("Initializing application...")
-data_processor = DataProcessor(use_mongodb=False)
+data_processor = DataProcessor(use_mongodb=True)
 ml_engine = RecommendationEngine(data_processor)
 try:
     import ssl
@@ -38,7 +38,7 @@ try:
     watchlist_manager = WatchlistManager(db)
     user_manager = UserManager(db)
     reviews_manager = ReviewsManager(db)
-    user_auth = UserAuth()
+    user_auth = UserAuth(db)
     print("✅ MongoDB connected successfully!")
 except Exception as e:
     print(f"⚠️  MongoDB not available: {e}")
@@ -47,18 +47,13 @@ except Exception as e:
         print('SSL library version:', getattr(_ssl, 'OPENSSL_VERSION', 'unknown'))
     except Exception:
         pass
-    # Print proxy environment variables that may interfere with TLS
-    import os as _os
-    for var in ('HTTP_PROXY', 'http_proxy', 'HTTPS_PROXY', 'https_proxy'):
-        val = _os.getenv(var)
-        if val:
-            print(f'Env {var}={val}')
-    print("⚠️  Running in CSV-only mode (auth features disabled)")
-    db = None
     watchlist_manager = WatchlistManager(None)
     user_manager = UserManager(None)
     reviews_manager = None
     user_auth = None
+    data_processor = DataProcessor(use_mongodb=False)
+
+ml_engine = RecommendationEngine(data_processor)
 
 @app.route('/api/health', methods=['GET'])
 def health_check():
@@ -186,7 +181,7 @@ def rate_movie():
     if not all([user_id, movie_id, rating]):
         return jsonify({'error': 'Missing required fields'}), 400
     
-    if db:
+    if db is not None:
         rating_doc = {
             'userId': user_id,
             'movieId': movie_id,
@@ -205,6 +200,33 @@ def rate_movie():
 
 @app.route('/api/user/<int:user_id>/stats', methods=['GET'])
 def get_user_stats(user_id):
+    # Try MongoDB first for real-time data
+    if db is not None:
+        try:
+            user_ratings = list(user_ratings_collection.find({'userId': user_id}))
+            if user_ratings:
+                import pandas as pd
+                ratings_df = pd.DataFrame(user_ratings)
+                
+                # Get genres from rated movies
+                rated_movie_ids = ratings_df['movieId'].tolist()
+                rated_movies = data_processor.movies[data_processor.movies['movieId'].isin(rated_movie_ids)]
+                
+                genres_rated = set()
+                for genres_list in rated_movies['genres_list']:
+                    if isinstance(genres_list, list):
+                        genres_rated.update(genres_list)
+                
+                stats = {
+                    'total_ratings': len(ratings_df),
+                    'avg_rating': float(ratings_df['rating'].mean()),
+                    'genres_rated': sorted(list(genres_rated))
+                }
+                return jsonify(stats)
+        except Exception as e:
+            print(f"Error getting user stats from MongoDB: {e}")
+    
+    # Fallback to data_processor
     stats = data_processor.get_user_rating_stats(user_id)
     
     if not stats:
@@ -663,7 +685,7 @@ def tune_hyperparameters():
         tuner = HyperparameterTuner()
         
         # Load ratings data
-        if db:
+        if db is not None:
             ratings_cursor = user_ratings_collection.find({})
             ratings_list = list(ratings_cursor)
             if ratings_list:
@@ -717,13 +739,6 @@ def get_tuning_history():
         }), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
-if __name__ == '__main__':
-    print("Starting Flask server...")
-    print(f"Loaded {len(data_processor.movies)} movies")
-    print(f"Loaded {len(data_processor.ratings)} ratings")
-    app.run(debug=True, port=5000)
-
 
 from ml.training_service import TrainingService
 from ml.ml_model_manager import MLModelManager
@@ -1003,3 +1018,184 @@ def delete_model(version):
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+# Personalized Training Endpoints
+
+@app.route('/api/user/<int:user_id>/training-preferences', methods=['GET'])
+def get_training_preferences(user_id):
+    """Get user's training preferences"""
+    if db is None:
+        return jsonify({'error': 'Database not available'}), 503
+    
+    try:
+        prefs = db['training_preferences'].find_one({'userId': user_id})
+        if prefs:
+            prefs.pop('_id', None)
+            return jsonify({'preferences': prefs.get('preferences', {})})
+        return jsonify({'preferences': None})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/user/<int:user_id>/training-preferences', methods=['POST'])
+def save_training_preferences(user_id):
+    """Save user's training preferences"""
+    if db is None:
+        return jsonify({'error': 'Database not available'}), 503
+    
+    try:
+        data = request.json
+        preferences = data.get('preferences', {})
+        
+        db['training_preferences'].update_one(
+            {'userId': user_id},
+            {'$set': {'userId': user_id, 'preferences': preferences, 'updated_at': datetime.now()}},
+            upsert=True
+        )
+        
+        return jsonify({'success': True, 'message': 'Preferences saved'})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/ml/train-personal', methods=['POST'])
+def train_personal_model():
+    """Train a personalized model for a specific user"""
+    try:
+        data = request.json
+        user_id = data.get('userId')
+        preferences = data.get('preferences', {})
+        
+        if not user_id:
+            return jsonify({'error': 'userId required'}), 400
+        
+        # Get user's ratings
+        if db is not None:
+            user_ratings = list(user_ratings_collection.find({'userId': user_id}))
+            if len(user_ratings) < 5:
+                return jsonify({'error': 'Please rate at least 5 movies before training a personal model'}), 400
+        else:
+            user_ratings_df = data_processor.ratings[data_processor.ratings['userId'] == user_id]
+            if len(user_ratings_df) < 5:
+                return jsonify({'error': 'Please rate at least 5 movies before training a personal model'}), 400
+        
+        # Get all ratings for training
+        ratings_df = data_processor.ratings.copy()
+        
+        if len(ratings_df) < 100:
+            return jsonify({'error': 'Insufficient data for training'}), 400
+        
+        # Train the model
+        model, train_df, test_df = training_service.train_model('matrix_factorization', ratings_df)
+        
+        # Evaluate
+        metrics = evaluation_service.evaluate_model(model, test_df)
+        
+        # Save model with user preferences
+        metadata = {
+            'user_id': user_id,
+            'personalized': True,
+            'preferences': preferences,
+            'metrics': metrics,
+            'training_data': {
+                'n_users': len(train_df['userId'].unique()),
+                'n_movies': len(train_df['movieId'].unique()),
+                'n_ratings': len(train_df),
+                'user_ratings': len(user_ratings) if db is not None else len(user_ratings_df)
+            }
+        }
+        
+        version = ml_model_manager.save_model(model, f'personal_{user_id}', metadata)
+        
+        # Also save to user's profile
+        if db is not None:
+            db['user_profiles'].update_one(
+                {'userId': user_id},
+                {'$set': {
+                    'personal_model_version': version,
+                    'model_trained_at': datetime.now()
+                }},
+                upsert=True
+            )
+        
+        return jsonify({
+            'success': True,
+            'version': version,
+            'metrics': metrics,
+            'training_data': metadata['training_data'],
+            'message': f'Personal model trained successfully with your preferences!'
+        })
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/ml/recommendations/personal/<int:user_id>', methods=['GET'])
+def get_personal_recommendations(user_id):
+    """Get recommendations from user's personal model"""
+    try:
+        n = int(request.args.get('n', 10))
+        
+        # Try to load user's personal model
+        personal_model = ml_model_manager.load_model(f'personal_{user_id}', 'latest')
+        
+        if not personal_model:
+            # Fall back to global model
+            return get_ml_recommendations(user_id)
+        
+        # Get user's rated movies
+        user_ratings = data_processor.ratings[data_processor.ratings['userId'] == user_id]
+        rated_movies = user_ratings['movieId'].tolist()
+        
+        # Get recommendations
+        recommended_ids = personal_model.recommend(user_id, n=n*2, exclude_rated=True, rated_movies=rated_movies)
+        
+        # Get user's preferences
+        preferences = {}
+        if db is not None:
+            prefs_doc = db['training_preferences'].find_one({'userId': user_id})
+            if prefs_doc:
+                preferences = prefs_doc.get('preferences', {})
+        
+        # Filter by preferences
+        recommended_movies = data_processor.movies[
+            data_processor.movies['movieId'].isin(recommended_ids)
+        ]
+        
+        # Apply genre filter if specified
+        favorite_genres = preferences.get('favoriteGenres', [])
+        if favorite_genres:
+            recommended_movies = recommended_movies[
+                recommended_movies['genres_list'].apply(
+                    lambda x: any(g in x for g in favorite_genres) if isinstance(x, list) else False
+                )
+            ]
+        
+        # Apply minimum rating filter
+        min_rating = preferences.get('minRating', 0)
+        movies_with_stats = data_processor.get_movie_stats()
+        result = recommended_movies.merge(
+            movies_with_stats[['movieId', 'avg_rating', 'rating_count']],
+            on='movieId',
+            how='left'
+        )
+        
+        if min_rating > 0:
+            result = result[result['avg_rating'] >= min_rating]
+        
+        # Limit to requested number
+        result = result.head(n)
+        
+        return jsonify({
+            'user_id': user_id,
+            'recommendations': result.to_dict('records'),
+            'model_type': 'personal',
+            'preferences_applied': preferences
+        })
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+if __name__ == '__main__':
+    print("Starting Flask server...")
+    print(f"Loaded {len(data_processor.movies)} movies")
+    print(f"Loaded {len(data_processor.ratings)} ratings")
+    app.run(debug=True, port=5000)
+

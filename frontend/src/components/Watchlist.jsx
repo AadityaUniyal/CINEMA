@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import API_BASE_URL from '../config';
 
 const Watchlist = ({ userId }) => {
   const [watchlist, setWatchlist] = useState([]);
@@ -12,7 +13,7 @@ const Watchlist = ({ userId }) => {
   const fetchWatchlist = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`http://localhost:5000/api/watchlist/${userId}`);
+      const response = await axios.get(`${API_BASE_URL}/api/watchlist/${userId}`);
       setWatchlist(response.data.watchlist);
     } catch (error) {
       console.error('Error fetching watchlist:', error);
@@ -24,7 +25,7 @@ const Watchlist = ({ userId }) => {
   const removeFromWatchlist = async (movieId, e) => {
     e.stopPropagation();
     try {
-      await axios.delete(`http://localhost:5000/api/watchlist/${userId}/${movieId}`);
+      await axios.delete(`${API_BASE_URL}/api/watchlist/${userId}/${movieId}`);
       setWatchlist(prev => prev.filter(m => m.movieId !== movieId));
     } catch (error) {
       console.error('Error removing from watchlist:', error);
@@ -34,7 +35,7 @@ const Watchlist = ({ userId }) => {
   const markAsWatched = async (movieId, e) => {
     e.stopPropagation();
     try {
-      await axios.put(`http://localhost:5000/api/watchlist/${userId}/${movieId}/watched`);
+      await axios.put(`${API_BASE_URL}/api/watchlist/${userId}/${movieId}/watched`);
       setWatchlist(prev => prev.filter(m => m.movieId !== movieId));
     } catch (error) {
       console.error('Error marking as watched:', error);

@@ -4,12 +4,12 @@ from werkzeug.security import generate_password_hash, check_password_hash
 class UserManager:
     def __init__(self, db):
         self.db = db
-        self.users_collection = db['users'] if db else None
-        self.preferences_collection = db['user_preferences'] if db else None
-        self.favorites_collection = db['favorites'] if db else None
+        self.users_collection = db['users'] if db is not None else None
+        self.preferences_collection = db['user_preferences'] if db is not None else None
+        self.favorites_collection = db['favorites'] if db is not None else None
     
     def create_user(self, username, email, password):
-        if not self.users_collection:
+        if self.users_collection is None:
             return None
         
         if self.users_collection.find_one({'$or': [{'username': username}, {'email': email}]}):
@@ -27,7 +27,7 @@ class UserManager:
         return str(result.inserted_id)
     
     def authenticate_user(self, username, password):
-        if not self.users_collection:
+        if self.users_collection is None:
             return None
         
         user = self.users_collection.find_one({'username': username})
@@ -44,7 +44,7 @@ class UserManager:
         return None
     
     def save_preferences(self, user_id, preferred_genres, favorite_tags):
-        if not self.preferences_collection:
+        if self.preferences_collection is None:
             return False
         
         preferences = {
@@ -62,13 +62,13 @@ class UserManager:
         return True
     
     def get_preferences(self, user_id):
-        if not self.preferences_collection:
+        if self.preferences_collection is None:
             return None
         
         return self.preferences_collection.find_one({'user_id': user_id})
     
     def add_favorite(self, user_id, movie_id):
-        if not self.favorites_collection:
+        if self.favorites_collection is None:
             return False
         
         existing = self.favorites_collection.find_one({
@@ -89,7 +89,7 @@ class UserManager:
         return True
     
     def remove_favorite(self, user_id, movie_id):
-        if not self.favorites_collection:
+        if self.favorites_collection is None:
             return False
         
         result = self.favorites_collection.delete_one({
@@ -99,14 +99,14 @@ class UserManager:
         return result.deleted_count > 0
     
     def get_favorites(self, user_id):
-        if not self.favorites_collection:
+        if self.favorites_collection is None:
             return []
         
         favorites = list(self.favorites_collection.find({'user_id': user_id}))
         return [{'movie_id': fav['movie_id'], 'added_at': fav['added_at']} for fav in favorites]
     
     def is_favorite(self, user_id, movie_id):
-        if not self.favorites_collection:
+        if self.favorites_collection is None:
             return False
         
         return self.favorites_collection.find_one({

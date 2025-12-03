@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import '../styles/Login.css';
 import axios from 'axios';
+import API_BASE_URL from '../config';
 
 const Login = ({ onLogin }) => {
   const [isRegister, setIsRegister] = useState(false);
@@ -90,7 +91,7 @@ const Login = ({ onLogin }) => {
     try {
       if (isRegister) {
         
-        const response = await axios.post('http://localhost:5000/api/auth/register', {
+        const response = await axios.post(`${API_BASE_URL}/api/auth/register`, {
           name: formData.name.trim(),
           email: formData.email.trim(),
           password: formData.password
@@ -104,7 +105,7 @@ const Login = ({ onLogin }) => {
         }
       } else {
         
-        const response = await axios.post('http://localhost:5000/api/auth/login', {
+        const response = await axios.post(`${API_BASE_URL}/api/auth/login`, {
           email: formData.email.trim(),
           password: formData.password
         });
@@ -125,12 +126,7 @@ const Login = ({ onLogin }) => {
 
   const toggleMode = () => {
     setIsRegister(!isRegister);
-    setFormData({
-      name: '',
-      email: '',
-      password: '',
-      confirmPassword: ''
-    });
+    setFormData({name: '',email: '',password: '',confirmPassword: ''});
     setError('');
     setSuccess('');
   };

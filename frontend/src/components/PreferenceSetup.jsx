@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import API_BASE_URL from '../config';
 
 const PreferenceSetup = ({ userId, onComplete }) => {
   const [genres, setGenres] = useState([]);
@@ -16,8 +17,8 @@ const PreferenceSetup = ({ userId, onComplete }) => {
   const fetchOptions = async () => {
     try {
       const [genresRes, tagsRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/genres'),
-        axios.get('http://localhost:5000/api/tags')
+        axios.get(`${API_BASE_URL}/api/genres`),
+        axios.get(`${API_BASE_URL}/api/tags`)
       ]);
       setGenres(genresRes.data.genres);
       setTags(tagsRes.data.tags);
@@ -52,7 +53,7 @@ const PreferenceSetup = ({ userId, onComplete }) => {
 
     setSaving(true);
     try {
-      await axios.post('http://localhost:5000/api/preferences/setup', {
+      await axios.post(`${API_BASE_URL}/api/preferences/setup`, {
         user_id: userId,
         preferred_genres: selectedGenres,
         favorite_tags: selectedTags

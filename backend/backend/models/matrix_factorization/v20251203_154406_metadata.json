@@ -1,0 +1,22 @@
+{
+  "hyperparameters": {
+    "n_factors": 50,
+    "learning_rate": 0.01,
+    "regularization": 0.02,
+    "epochs": 20
+  },
+  "metrics": {
+    "rmse": 0.9211303958021725,
+    "precision_at_10": 0.0,
+    "recall_at_10": 0.0,
+    "coverage": 0.09838403041825095
+  },
+  "training_data": {
+    "n_users": 130,
+    "n_movies": 4429,
+    "n_ratings": 16000
+  },
+  "version": "v20251203_154406",
+  "model_type": "matrix_factorization",
+  "saved_at": "2025-12-03T15:44:06.939715"
+}

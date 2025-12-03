@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import axios from 'axios';
+import API_BASE_URL from '../config';
 
 const SearchBar = ({ onSearch }) => {
   const [query, setQuery] = useState('');
@@ -29,7 +30,7 @@ const SearchBar = ({ onSearch }) => {
       }
 
       try {
-        const response = await axios.get(`http://localhost:5000/api/search?q=${query}&limit=5`);
+        const response = await axios.get(`${API_BASE_URL}/api/search?q=${query}&limit=5`);
         setSuggestions(response.data.results || []);
         setShowSuggestions(true);
       } catch (error) {
@@ -48,7 +49,7 @@ const SearchBar = ({ onSearch }) => {
     setIsSearching(true);
     setShowSuggestions(false);
     try {
-      const response = await axios.get(`http://localhost:5000/api/search?q=${query}`);
+      const response = await axios.get(`${API_BASE_URL}/api/search?q=${query}`);
       onSearch(response.data.results);
     } catch (error) {
       console.error('Search error:', error);

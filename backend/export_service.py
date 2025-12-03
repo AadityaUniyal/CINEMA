@@ -29,7 +29,7 @@ class ExportService:
         user_ratings = data_processor.ratings[data_processor.ratings['userId'] == user_id]
         user_data['ratings'] = user_ratings.to_dict('records')
         
-        if db:
+        if db is not None:
             watchlist = list(db['watchlists'].find({'userId': user_id}))
             user_data['watchlist'] = [{'movieId': item['movieId'], 'addedAt': str(item['addedAt'])} for item in watchlist]
         

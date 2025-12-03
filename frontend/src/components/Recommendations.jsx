@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import API_BASE_URL from '../config';
 import MovieCard from './MovieCard';
 
 const Recommendations = ({ userId }) => {
@@ -16,7 +17,7 @@ const Recommendations = ({ userId }) => {
 
   const fetchUserStats = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/user/${userId}/stats`);
+      const response = await axios.get(`${API_BASE_URL}/api/user/${userId}/stats`);
       setUserRatingCount(response.data.total_ratings || 0);
     } catch (error) {
       console.error('Error fetching user stats:', error);
@@ -33,7 +34,7 @@ const Recommendations = ({ userId }) => {
     
     try {
       // Try ML endpoint first
-      const response = await axios.get(`http://localhost:5000/api/ml/recommendations/${userId}`, {
+      const response = await axios.get(`${API_BASE_URL}/api/ml/recommendations/${userId}`, {
         params: { n: 24 }
       });
       
@@ -41,7 +42,7 @@ const Recommendations = ({ userId }) => {
       const recommendationsWithConfidence = await Promise.all(
         response.data.recommendations.map(async (movie) => {
           try {
-            const predictionResponse = await axios.post('http://localhost:5000/api/ml/predict', {
+            const predictionResponse = await axios.post(`${API_BASE_URL}/api/ml/predict`, {
               userId,
               movieId: movie.movieId
             });
@@ -63,7 +64,7 @@ const Recommendations = ({ userId }) => {
       
       // Fallback to hybrid recommendations
       try {
-        const fallbackResponse = await axios.get(`http://localhost:5000/api/recommendations/${userId}`, {
+        const fallbackResponse = await axios.get(`${API_BASE_URL}/api/recommendations/${userId}`, {
           params: { n: 24 }
         });
         setRecommendations(fallbackResponse.data.recommendations.map(m => ({ ...m, mlBased: false })));

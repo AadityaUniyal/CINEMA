@@ -5,10 +5,10 @@ from pymongo import DESCENDING
 class ReviewsManager:
     def __init__(self, db):
         self.db = db
-        self.reviews_collection = db['reviews'] if db else None
+        self.reviews_collection = db['reviews'] if db is not None else None
     
     def add_review(self, user_id, movie_id, rating, comment):
-        if not self.reviews_collection:
+        if self.reviews_collection is None:
             return {'error': 'Database not available'}
         
         review = {
@@ -29,7 +29,7 @@ class ReviewsManager:
         return {'success': True, 'review': review}
     
     def get_movie_reviews(self, movie_id, limit=20):
-        if not self.reviews_collection:
+        if self.reviews_collection is None:
             return []
         
         reviews = list(self.reviews_collection.find(
@@ -37,7 +37,7 @@ class ReviewsManager:
             {'_id': 0}
         ).sort('timestamp', DESCENDING).limit(limit))
         
-        if reviews and self.db:
+        if reviews and self.db is not None:
             user_ids = [r['userId'] for r in reviews]
             user_profiles = list(self.db['user_profiles'].find(
                 {'userId': {'$in': user_ids}},
@@ -52,7 +52,7 @@ class ReviewsManager:
         return reviews
     
     def get_user_reviews(self, user_id, limit=20):
-        if not self.reviews_collection:
+        if self.reviews_collection is None:
             return []
         
         reviews = list(self.reviews_collection.find(
@@ -63,7 +63,7 @@ class ReviewsManager:
         return reviews
     
     def like_review(self, user_id, movie_id, reviewer_id):
-        if not self.reviews_collection:
+        if self.reviews_collection is None:
             return {'error': 'Database not available'}
         
         result = self.reviews_collection.update_one(
@@ -74,7 +74,7 @@ class ReviewsManager:
         return {'success': result.modified_count > 0}
     
     def delete_review(self, user_id, movie_id):
-        if not self.reviews_collection:
+        if self.reviews_collection is None:
             return {'error': 'Database not available'}
         
         result = self.reviews_collection.delete_one({

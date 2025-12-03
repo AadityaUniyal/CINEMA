@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import API_BASE_URL from '../config';
 import '../styles/TrainingDashboard.css';
 
 const TrainingDashboard = () => {
@@ -16,7 +17,7 @@ const TrainingDashboard = () => {
 
   const fetchMetrics = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/ml/metrics');
+      const response = await axios.get(`${API_BASE_URL}/api/ml/metrics`);
       setMetrics(response.data);
     } catch (error) {
       console.error('Error fetching metrics:', error);
@@ -27,7 +28,7 @@ const TrainingDashboard = () => {
 
   const fetchHistory = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/ml/metrics/history');
+      const response = await axios.get(`${API_BASE_URL}/api/ml/metrics/history`);
       setHistory(response.data.history || []);
     } catch (error) {
       console.error('Error fetching history:', error);
@@ -39,7 +40,7 @@ const TrainingDashboard = () => {
     setTrainResult(null);
     
     try {
-      const response = await axios.post('http://localhost:5000/api/ml/train');
+      const response = await axios.post(`${API_BASE_URL}/api/ml/train`);
       setTrainResult({
         success: true,
         message: 'Model trained successfully!',

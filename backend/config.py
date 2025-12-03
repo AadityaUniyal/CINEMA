@@ -25,6 +25,9 @@ class Config:
     
     JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY', 'your-secret-key-change-in-production')
     
+    # CORS Configuration
+    CORS_ORIGINS = os.getenv('CORS_ORIGINS', '*').split(',')
+    
     CACHE_TTL = 300
     ENABLE_CACHE = True
     

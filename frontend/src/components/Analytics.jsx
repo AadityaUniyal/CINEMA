@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import API_BASE_URL from '../config';
 import { Chart as ChartJS, ArcElement, CategoryScale, LinearScale, BarElement, LineElement, PointElement, Title, Tooltip, Legend } from 'chart.js';
 import { Pie, Bar, Line } from 'react-chartjs-2';
 
@@ -20,11 +21,11 @@ const Analytics = () => {
   const fetchAnalytics = async () => {
     try {
       const [genreRes, ratingRes, trendsRes, topRatedRes, activityRes] = await Promise.all([
-        axios.get('http://localhost:5000/api/analytics/genre-distribution'),
-        axios.get('http://localhost:5000/api/analytics/rating-distribution'),
-        axios.get('http://localhost:5000/api/analytics/trends'),
-        axios.get('http://localhost:5000/api/analytics/top-rated'),
-        axios.get('http://localhost:5000/api/analytics/user-activity')
+        axios.get(`${API_BASE_URL}/api/analytics/genre-distribution`),
+        axios.get(`${API_BASE_URL}/api/analytics/rating-distribution`),
+        axios.get(`${API_BASE_URL}/api/analytics/trends`),
+        axios.get(`${API_BASE_URL}/api/analytics/top-rated`),
+        axios.get(`${API_BASE_URL}/api/analytics/user-activity`)
       ]);
 
       const genres = Object.keys(genreRes.data.distribution).slice(0, 10);

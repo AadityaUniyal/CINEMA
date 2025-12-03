@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import API_BASE_URL from '../config';
 import '../styles/GenrePreference.css';
 
 const GenrePreference = ({ userId, onComplete }) => {
@@ -14,7 +15,7 @@ const GenrePreference = ({ userId, onComplete }) => {
 
   const fetchGenres = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/genres');
+      const response = await axios.get(`${API_BASE_URL}/api/genres`);
       setGenres(response.data.genres || []);
     } catch (error) {
       console.error('Error fetching genres:', error);
@@ -39,7 +40,7 @@ const GenrePreference = ({ userId, onComplete }) => {
 
     setSaving(true);
     try {
-      await axios.post('http://localhost:5000/api/user/preferences', {
+      await axios.post(`${API_BASE_URL}/api/user/preferences`, {
         userId,
         preferredGenres: selectedGenres
       });

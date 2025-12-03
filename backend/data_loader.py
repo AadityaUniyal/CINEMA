@@ -2,11 +2,17 @@ import pandas as pd
 from pymongo import MongoClient
 from config import Config
 import os
+import certifi
 
 class DataLoader:
     
     def __init__(self):
-        self.client = MongoClient(Config.MONGO_URI)
+        # Use certifi for SSL certificates and set connection timeout
+        self.client = MongoClient(
+            Config.MONGO_URI,
+            serverSelectionTimeoutMS=10000,
+            tlsCAFile=certifi.where()
+        )
         self.db = self.client[Config.DB_NAME]
     
     def load_csv_to_mongodb(self):

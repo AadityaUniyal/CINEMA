@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import API_BASE_URL from '../config';
 import '../styles/Dashboard.css';
 
 const Dashboard = ({ userId }) => {
@@ -18,10 +19,10 @@ const Dashboard = ({ userId }) => {
     setLoading(true);
     try {
       const [statsRes, reviewsRes, watchlistRes, profileRes] = await Promise.all([
-        axios.get(`http://localhost:5000/api/user/${userId}/stats`),
-        axios.get(`http://localhost:5000/api/reviews/user/${userId}`),
-        axios.get(`http://localhost:5000/api/watchlist/${userId}`),
-        axios.get(`http://localhost:5000/api/auth/profile/${userId}`)
+        axios.get(`${API_BASE_URL}/api/user/${userId}/stats`),
+        axios.get(`${API_BASE_URL}/api/reviews/user/${userId}`),
+        axios.get(`${API_BASE_URL}/api/watchlist/${userId}`),
+        axios.get(`${API_BASE_URL}/api/auth/profile/${userId}`)
       ]);
 
       setUserStats(statsRes.data || {
@@ -35,7 +36,7 @@ const Dashboard = ({ userId }) => {
       if (reviews.length > 0) {
         const movieIds = reviews.map(r => r.movieId);
         try {
-          const moviesRes = await axios.get('http://localhost:5000/api/movies', {
+          const moviesRes = await axios.get(`${API_BASE_URL}/api/movies`, {
             params: { per_page: 1000 }
           });
           const moviesMap = {};

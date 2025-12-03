@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
+import API_BASE_URL from '../config';
 import SearchBar from './SearchBar';
 import MovieCard from './MovieCard';
 import TrendingGenres from './TrendingGenres';
@@ -23,7 +24,7 @@ const MovieList = ({ userId }) => {
 
   const fetchGenres = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/genres');
+      const response = await axios.get(`${API_BASE_URL}/api/genres`);
       setGenres(response.data.genres);
     } catch (error) {
       console.error('Error fetching genres:', error);
@@ -36,7 +37,7 @@ const MovieList = ({ userId }) => {
       const params = { page, per_page: 24 };
       if (selectedGenre) params.genre = selectedGenre;
       
-      const response = await axios.get('http://localhost:5000/api/movies', { params });
+      const response = await axios.get(`${API_BASE_URL}/api/movies`, { params });
       setMovies(response.data.movies);
       setTotalPages(response.data.total_pages);
       setSearchResults(null);

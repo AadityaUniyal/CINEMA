@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import API_BASE_URL from '../config';
 import MovieCard from './MovieCard';
 
 const RandomMovies = ({ userId }) => {
@@ -13,9 +14,16 @@ const RandomMovies = ({ userId }) => {
     fetchRandomMovies();
   }, []);
 
+  useEffect(() => {
+    // Auto-fetch when genre changes (but not on initial load)
+    if (genre !== '') {
+      fetchRandomMovies();
+    }
+  }, [genre]);
+
   const fetchGenres = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/genres');
+      const response = await axios.get(`${API_BASE_URL}/api/genres`);
       setGenres(response.data.genres);
     } catch (error) {
       console.error('Error fetching genres:', error);
@@ -28,7 +36,7 @@ const RandomMovies = ({ userId }) => {
       const params = { n: 24 };
       if (genre) params.genre = genre;
       
-      const response = await axios.get('http://localhost:5000/api/movies/random', { params });
+      const response = await axios.get(`${API_BASE_URL}/api/movies/random`, { params });
       setMovies(response.data.movies);
     } catch (error) {
       console.error('Error fetching random movies:', error);

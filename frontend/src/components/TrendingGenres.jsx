@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import API_BASE_URL from '../config';
 
 const TrendingGenres = ({ onGenreClick }) => {
   const [trendingGenres, setTrendingGenres] = useState([]);
@@ -11,7 +12,7 @@ const TrendingGenres = ({ onGenreClick }) => {
 
   const fetchTrendingGenres = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/analytics/trending-genres');
+      const response = await axios.get(`${API_BASE_URL}/api/analytics/trending-genres`);
       setTrendingGenres(response.data.trending_genres || []);
     } catch (error) {
       console.error('Error fetching trending genres:', error);

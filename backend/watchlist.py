@@ -3,10 +3,10 @@ from datetime import datetime
 class WatchlistManager:
     def __init__(self, db):
         self.db = db
-        self.collection = db['watchlists'] if db else None
+        self.collection = db['watchlists'] if db is not None else None
     
     def add_to_watchlist(self, user_id, movie_id):
-        if not self.collection:
+        if self.collection is None:
             return False
         
         watchlist_item = {
@@ -24,21 +24,21 @@ class WatchlistManager:
         return True
     
     def remove_from_watchlist(self, user_id, movie_id):
-        if not self.collection:
+        if self.collection is None:
             return False
         
         result = self.collection.delete_one({'userId': user_id, 'movieId': movie_id})
         return result.deleted_count > 0
     
     def get_watchlist(self, user_id):
-        if not self.collection:
+        if self.collection is None:
             return []
         
         watchlist = list(self.collection.find({'userId': user_id, 'watched': False}))
         return [{'movieId': item['movieId'], 'addedAt': item['addedAt']} for item in watchlist]
     
     def mark_as_watched(self, user_id, movie_id):
-        if not self.collection:
+        if self.collection is None:
             return False
         
         result = self.collection.update_one(
@@ -48,7 +48,7 @@ class WatchlistManager:
         return result.modified_count > 0
     
     def get_watched_movies(self, user_id):
-        if not self.collection:
+        if self.collection is None:
             return []
         
         watched = list(self.collection.find({'userId': user_id, 'watched': True}))

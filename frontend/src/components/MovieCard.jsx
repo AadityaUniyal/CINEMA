@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import API_BASE_URL from '../config';
 
 const MovieCard = ({ movie, userId, onUpdate, showConfidence = false }) => {
   const [rating, setRating] = useState(0);
@@ -22,14 +23,14 @@ const MovieCard = ({ movie, userId, onUpdate, showConfidence = false }) => {
     setIsSubmitting(true);
     try {
       
-      await axios.post('http://localhost:5000/api/rate', {
+      await axios.post(`${API_BASE_URL}/api/rate`, {
         userId,
         movieId: movie.movieId,
         rating
       });
 
       if (comment.trim()) {
-        await axios.post('http://localhost:5000/api/reviews', {
+        await axios.post(`${API_BASE_URL}/api/reviews`, {
           userId,
           movieId: movie.movieId,
           rating,
@@ -51,7 +52,7 @@ const MovieCard = ({ movie, userId, onUpdate, showConfidence = false }) => {
 
   const loadReviews = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/reviews/${movie.movieId}`);
+      const response = await axios.get(`${API_BASE_URL}/api/reviews/${movie.movieId}`);
       setReviews(response.data.reviews || []);
       setShowReviews(true);
     } catch (error) {
@@ -75,10 +76,10 @@ const MovieCard = ({ movie, userId, onUpdate, showConfidence = false }) => {
     setWatchlistLoading(true);
     try {
       if (isInWatchlist) {
-        await axios.delete(`http://localhost:5000/api/watchlist/${userId}/${movie.movieId}`);
+        await axios.delete(`${API_BASE_URL}/api/watchlist/${userId}/${movie.movieId}`);
         setIsInWatchlist(false);
       } else {
-        await axios.post(`http://localhost:5000/api/watchlist/${userId}/${movie.movieId}`);
+        await axios.post(`${API_BASE_URL}/api/watchlist/${userId}/${movie.movieId}`);
         setIsInWatchlist(true);
       }
       if (onUpdate) onUpdate();
@@ -97,7 +98,7 @@ const MovieCard = ({ movie, userId, onUpdate, showConfidence = false }) => {
     
     setLoadingExplanation(true);
     try {
-      const response = await axios.get(`http://localhost:5000/api/ml/explain/${userId}/${movie.movieId}`);
+      const response = await axios.get(`${API_BASE_URL}/api/ml/explain/${userId}/${movie.movieId}`);
       setExplanation(response.data);
       setShowExplanation(true);
     } catch (error) {

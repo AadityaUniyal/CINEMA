@@ -7,10 +7,13 @@ import re
 from datetime import datetime
 
 class UserAuth:
-    def __init__(self):
+    def __init__(self, db=None):
         try:
-            self.client = MongoClient(Config.MONGO_URI)
-            self.db = self.client[Config.DB_NAME]
+            if db is not None:
+                self.db = db
+            else:
+                self.client = MongoClient(Config.MONGO_URI)
+                self.db = self.client[Config.DB_NAME]
             self.users_collection = self.db['users']
             self.user_profiles_collection = self.db['user_profiles']
             self._create_indexes()
@@ -20,7 +23,7 @@ class UserAuth:
             self.user_profiles_collection = None
     
     def _create_indexes(self):
-        if self.users_collection:
+        if self.users_collection is not None:
             self.users_collection.create_index('email', unique=True)
             self.users_collection.create_index('userId', unique=True)
             self.user_profiles_collection.create_index('userId', unique=True)
@@ -68,7 +71,7 @@ class UserAuth:
         Register a new user
         Returns: (success, message, user_id)
         """
-        if not self.users_collection:
+        if self.users_collection is None:
             return False, "Database not available", None
         
         valid, msg = self._validate_name(name)
@@ -126,7 +129,7 @@ class UserAuth:
         Login user
         Returns: (success, message, user_id, user_data)
         """
-        if not self.users_collection:
+        if self.users_collection is None:
             return False, "Database not available", None, None
         
         user = self.users_collection.find_one({'email': email.lower().strip()})
@@ -158,7 +161,7 @@ class UserAuth:
         return True, "Login successful", user['userId'], user_data
     
     def get_user_profile(self, user_id):
-        if not self.user_profiles_collection:
+        if self.user_profiles_collection is None:
             return None
         
         return self.user_profiles_collection.find_one(
@@ -167,7 +170,7 @@ class UserAuth:
         )
     
     def update_user_rating(self, user_id, movie_id, rating):
-        if not self.user_profiles_collection:
+        if self.user_profiles_collection is None:
             return False
         
         profile = self.get_user_profile(user_id)
@@ -204,7 +207,7 @@ class UserAuth:
         return True
     
     def add_user_review(self, user_id, movie_id, rating, comment):
-        if not self.user_profiles_collection:
+        if self.user_profiles_collection is None:
             return False
         
         profile = self.get_user_profile(user_id)
@@ -237,7 +240,7 @@ class UserAuth:
         return True
     
     def add_favorite_movie(self, user_id, movie_id):
-        if not self.user_profiles_collection:
+        if self.user_profiles_collection is None:
             return False
         
         self.user_profiles_collection.update_one(
@@ -248,7 +251,7 @@ class UserAuth:
         return True
     
     def remove_favorite_movie(self, user_id, movie_id):
-        if not self.user_profiles_collection:
+        if self.user_profiles_collection is None:
             return False
         
         self.user_profiles_collection.update_one(
@@ -259,7 +262,7 @@ class UserAuth:
         return True
     
     def update_watchlist(self, user_id, watchlist):
-        if not self.user_profiles_collection:
+        if self.user_profiles_collection is None:
             return False
         
         self.user_profiles_collection.update_one(

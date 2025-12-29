@@ -6,7 +6,6 @@ import json
 import os
 
 logger = get_ml_logger('feature_engineer')
-
 class FeatureEngineer:
     """
     Feature engineering pipeline for ML recommendation system.

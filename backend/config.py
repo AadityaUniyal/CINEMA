@@ -2,11 +2,9 @@ import os
 from urllib.parse import quote_plus
 
 class Config:
-    # Prefer credentials from environment for security. Falls back to the
-    # in-repo defaults only if the environment variables are not set.
+    
     username = quote_plus(os.getenv('MONGO_USER', 'aadityauniyal22_db_user'))
     password = quote_plus(os.getenv('MONGO_PASS', '3vQYBshs_!nv@j9'))
-    # Allow full override via MONGO_URI env var (recommended for production).
     MONGO_URI = os.getenv('MONGO_URI', f'mongodb+srv://{username}:{password}@cluster1.4irifqj.mongodb.net/?retryWrites=true&w=majority&appName=Cluster1')
     DB_NAME = 'movielens_db'
     

@@ -1,9 +1,7 @@
 import numpy as np
 from sklearn.metrics import mean_squared_error
 from ml.ml_logger import get_ml_logger
-
 logger = get_ml_logger('evaluation_service')
-
 class EvaluationService:
     
     def evaluate_model(self, model, test_df):
